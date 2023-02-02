@@ -32,6 +32,8 @@ namespace GrassRendering
                 image.Data);
 
             GL.GenerateMipmap(GenerateMipmapTarget.Texture2D); //generates mipmaps of our texture
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.LinearMipmapLinear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureLodBias, -0.4f);
         }
 
         public void Use(TextureUnit unit)
