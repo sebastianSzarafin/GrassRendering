@@ -31,6 +31,8 @@ const float LOD2 = 10.0; // Medium Level Of Details
 const float LOD3 = 25.0; // Low Level Of Details
 const vec2 windDirection = vec2(1.0, 1.0);
 const float windStrength = 0.1;
+const float deflectionFactor = 0.25;
+const float leanFactor = 0.25;
 
 
 
@@ -93,7 +95,8 @@ void createGrass(vec4 basePosition, int numberOfQuads)
 	uv.x = mod(uv.x, 1.0);															// of the moving wind
 	uv.y = mod(uv.y, 1.0);															//
 	vec4 wind = texture(texWind, uv);
-	mat4 modelWind = (rotationX(wind.x * PI * 0.75 - PI * 0.25) * rotationZ(wind.y * PI * 0.75 - PI * 0.25));
+	mat4 modelWind = (rotationX(wind.x * PI * deflectionFactor - PI * leanFactor) * 
+						rotationZ(wind.y * PI * deflectionFactor - PI * leanFactor));
 
 	mat4 model0 = mat4(1.0);
 	mat4 model45 = rotationY(radians(45));
