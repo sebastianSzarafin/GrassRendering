@@ -9,9 +9,7 @@ namespace GrassRendering
 {
     public class Game : GameWindow
     {
-        private Vector4 skyColor = new Vector4(0.94f, 0.97f, 0.96f, 1.0f);
-
-        private Stopwatch timer;
+        private DayTimeScheduler scheduler;
 
         private Camera camera;
 
@@ -35,8 +33,8 @@ namespace GrassRendering
         {
             CenterWindow();
 
-            timer = new Stopwatch();
-            
+            scheduler = new DayTimeScheduler(DayTime.Morning);
+
             camera = new Camera(new Vector3(0.0f, 1.0f, 3.0f), Size.X / (float)Size.Y);            
 
             terrain = new Terrain(
@@ -55,20 +53,18 @@ namespace GrassRendering
 
         protected override void OnLoad()
         {
-            timer.Start();
+            scheduler.timer.Start();
             CursorState = CursorState.Grabbed;
             IsVisible = true;
 
             GL.Enable(EnableCap.DepthTest); //enable z buffer
-
-            GL.ClearColor((Color4)skyColor); //sets color when clearing the background
 
             base.OnLoad();
         }
 
         protected override void OnUnload()
         {
-            timer.Stop();
+            scheduler.timer.Stop();
 
             terrain.Unload();
             grass.Unload();
@@ -92,16 +88,18 @@ namespace GrassRendering
 
             camera.UpdatePos(MouseState);
 
+            scheduler.UpdateTime();
         }
 
         protected override void OnRenderFrame(FrameEventArgs args)
         {
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            GL.ClearColor((Color4)scheduler.current);
 
 
 
-            terrain.Draw(camera, skyColor);
-            grass.Draw(timer, camera, skyColor);
+            terrain.Draw(camera, scheduler);
+            grass.Draw(camera, scheduler);
 
             Context.SwapBuffers();
             base.OnRenderFrame(args);

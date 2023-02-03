@@ -37,7 +37,7 @@ namespace GrassRendering
                 grassTexts.Add(new Texture($"..\\..\\..\\..\\GrassRendering\\assets\\textures\\flower{i}_texture.png", TextureUnit.Texture0 + i + 1));
         }
 
-        public void Draw(Stopwatch timer, Camera camera, Vector4 skyColor)
+        public void Draw(Camera camera, DayTimeScheduler scheduler)
         {
             int texWindLocation = GL.GetUniformLocation(shader.Handle, "texWind");
             int[] texGrassLocations = new int[grassTexts.Count];
@@ -56,9 +56,9 @@ namespace GrassRendering
                 grassTexts[i].Use(TextureUnit.Texture0 + i + 1);
             }
 
-            shader.SetFloat("time", (float)timer.Elapsed.TotalSeconds);
+            shader.SetFloat("time", (float)scheduler.timer.Elapsed.TotalSeconds);
             shader.SetVector3("cameraPos", camera.position);
-            shader.SetVector4("skyColor", skyColor);
+            shader.SetVector4("skyColor", scheduler.current);
 
             shader.SetMatrix4("view", camera.GetViewMatrix());
             shader.SetMatrix4("projection", camera.GetProjectionMatrix());

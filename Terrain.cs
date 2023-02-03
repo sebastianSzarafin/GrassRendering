@@ -79,7 +79,7 @@ namespace GrassRendering
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
         }
 
-        public void Draw(Camera camera, Vector4 skyColor)
+        public void Draw(Camera camera, DayTimeScheduler scheduler)
         {
             int texTerrainLocation = GL.GetUniformLocation(shader.Handle, "texTerrain");
 
@@ -89,7 +89,7 @@ namespace GrassRendering
             texTerrain.Use(TextureUnit.Texture0);
 
             shader.SetVector3("cameraPos", camera.position);
-            shader.SetVector4("skyColor", skyColor);
+            shader.SetVector4("skyColor", scheduler.current);
             shader.SetMatrix4("view", camera.GetViewMatrix());
             shader.SetMatrix4("projection", camera.GetProjectionMatrix());
 
