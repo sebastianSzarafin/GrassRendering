@@ -3,7 +3,7 @@
 in float distanceFromCamera;
 in vec2 texCoord;
 
-uniform float visibility;
+uniform float fogDensity;
 uniform vec4 skyColor;
 uniform sampler2D texTerrain;
 
@@ -15,5 +15,5 @@ float getVisibility(float, float);
 void main()
 {
     outColor = mix(texture(texTerrain, texCoord), vec4(0), 0.5);
-    outColor = mix(skyColor, outColor, getVisibility(distanceFromCamera, visibility));
+    outColor = mix(skyColor, outColor, getVisibility(distanceFromCamera, fogDensity));
 }

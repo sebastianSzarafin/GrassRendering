@@ -90,7 +90,7 @@ namespace GrassRendering
 
             shader.SetVector3("cameraPos", camera.position);
             shader.SetVector4("skyColor", scheduler.current);
-            shader.SetFloat("visibility", scheduler.visibility);
+            shader.SetFloat("fogDensity", scheduler.fogDensity);
             shader.SetMatrix4("view", camera.GetViewMatrix());
             shader.SetMatrix4("projection", camera.GetProjectionMatrix());
 

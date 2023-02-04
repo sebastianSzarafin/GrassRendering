@@ -29,18 +29,18 @@ namespace GrassRendering
         {
             get
             {
-                Vector4 c1 = colors[(int)time];
+                /*Vector4 c1 = colors[(int)time];
                 Vector4 c2 = colors[(int)(time + 1) % dayTimes];
-                return c1 * (1 - mix) + c2 * mix;
-                //return colors[0];
+                return c1 * (1 - mix) + c2 * mix;*/
+                return colors[0];
             }
         }
-        public float visibility
+        public float fogDensity
         {
             get
             {
-                if (time == DayTime.Night && mix >= 0.5) return (mix - 0.5f) / 5;
-                else if (time == DayTime.Morning && mix <= 0.5) return (0.5f - mix) / 5;
+                //if (time == DayTime.Night && mix >= 0.5) return (mix - 0.5f) / 5;
+                //else if (time == DayTime.Morning && mix <= 0.5) return (0.5f - mix) / 5;
                 return 0.0f;
             }
         }
