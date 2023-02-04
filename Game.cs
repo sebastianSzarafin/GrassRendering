@@ -96,8 +96,6 @@ namespace GrassRendering
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.ClearColor((Color4)scheduler.current);
 
-
-
             terrain.Draw(camera, scheduler);
             grass.Draw(camera, scheduler);
 

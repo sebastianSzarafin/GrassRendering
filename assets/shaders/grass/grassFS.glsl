@@ -10,6 +10,7 @@ in GS_OUT {
 } fs_in;
 
 uniform vec4 skyColor;
+uniform float visibility;
 uniform sampler2D texGrass1;
 uniform sampler2D texGrass2;
 uniform sampler2D texGrass3;
@@ -22,7 +23,7 @@ float texBorderDetail = 0.1;
 /* USEFUL FUNCTIONS */
 vec4 mapTexture();
 bool isTexBorder(vec3);
-float getVisibility(float);
+float getVisibility(float, float);
 
 void main(){
 	vec4 color = mapTexture();
@@ -31,7 +32,7 @@ void main(){
 	if(color.a < 0.05
 	|| isTexBorder(color.xyz)) discard;
 
-	outColor = mix(skyColor, color, getVisibility(fs_in.distanceFromCamera));
+	outColor = mix(skyColor, color, getVisibility(fs_in.distanceFromCamera, visibility));
 }
 
 vec4 mapTexture()

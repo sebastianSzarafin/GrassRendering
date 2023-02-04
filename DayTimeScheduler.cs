@@ -18,22 +18,32 @@ namespace GrassRendering
     }
     internal class DayTimeScheduler
     {
-        private const float day = 60; 
-        private const int dayTimes = 4;
+        public const float day = 60; 
+        public const int dayTimes = 4;
 
-        DayTime time;
-        Vector4[] colors;
+        private Vector4[] colors;
+
+        public float mix;
+        public DayTime time;
         public Vector4 current 
         {
             get
             {
-                /*Vector4 c1 = colors[(int)time];
-                Vector4 c2 = colors[(int)(time + 1) % dayTimes]; 
-                return c1 * (1 - mix) + c2 * mix;*/
-                return colors[0];
+                Vector4 c1 = colors[(int)time];
+                Vector4 c2 = colors[(int)(time + 1) % dayTimes];
+                return c1 * (1 - mix) + c2 * mix;
+                //return colors[0];
             }
         }
-        public float mix;
+        public float visibility
+        {
+            get
+            {
+                if (time == DayTime.Night && mix >= 0.5) return (mix - 0.5f) / 5;
+                else if (time == DayTime.Morning && mix <= 0.5) return (0.5f - mix) / 5;
+                return 0.0f;
+            }
+        }
         public Stopwatch timer;
 
         public DayTimeScheduler(DayTime time)
@@ -52,9 +62,9 @@ namespace GrassRendering
         public void UpdateTime()
         {
             const double period = day / dayTimes;
-            double totalSeconds = timer.Elapsed.TotalSeconds;
+            double dayPart = timer.Elapsed.TotalSeconds % day;
 
-            switch(totalSeconds)
+            switch(dayPart)
             {
                 case <= period:                    
                     time = DayTime.Morning;
@@ -70,9 +80,7 @@ namespace GrassRendering
                     break;
             }
 
-            if (totalSeconds >= 60) timer.Restart();
-
-            mix = (float)(totalSeconds % (period) / period);
+            mix = (float)(dayPart % (period) / period);
         }
     }
 }
