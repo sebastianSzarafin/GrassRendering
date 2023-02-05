@@ -15,7 +15,7 @@ namespace GrassRendering
 {
     internal class Terrain
     {
-        private const float treshhold = 30.0f;
+        private const float treshhold = 10.0f;
         private const float space = 0.2f;
 
         private Shader shader;
@@ -137,13 +137,14 @@ namespace GrassRendering
         private Vertex[] ProcessVertices()
         {
             List<Vertex> vertices = new List<Vertex>();
-            for (float x = -treshhold; x < treshhold; x += space)
+            for (float x = -treshhold; x < treshhold; x = (float)Math.Round(x + space, 2))
             {
-                for (float z = -treshhold; z < treshhold; z += space)
+                float y = getHeight(x, 4f / 10f * treshhold, 8f / 10f * treshhold);
+                for (float z = -treshhold; z < treshhold; z = (float)Math.Round(z + space, 2))
                 {
                     vertices.Add(
                         new Vertex(
-                            new Vector3(x, 0, z),
+                            new Vector3(x, y, z),
                             Vector3.UnitY,
                             new Vector2(Math.Abs(x) / treshhold, Math.Abs(z) / treshhold),
                             WithdrawTexture()));
@@ -151,21 +152,30 @@ namespace GrassRendering
             }
             this.vertices = vertices.ToArray();
             return vertices.ToArray();
+
+            float getHeight(float x, float begin, float end)
+            {
+                if (x < begin || x > end) return 0.0f;
+
+                float a = (float)(-Math.PI / 2), b = -a;
+                float height = (float)-Math.Cos((b - a) * (x - begin) / (end - begin) + a) * treshhold / 10.0f;
+                return Math.Min(height, 0);
+            }
         }
 
         private int[] ProcessIndices()
         {
             List<int> indices = new List<int>();
             int colCount = (int)(treshhold * 2 / space), step = colCount / 10, size = colCount / step, x = 0;
-            
-            for (x = 0; x < size - 1; x++)
+            //left side of the river
+            for (x = 0; x < (int)(0.7 * size); x++)
             {
                 for (int z = 0; z < size; z++)
                 {
                     int topLeft = z * step + x * step * colCount;
                     int topRight = z * step + (x + 1) * step * colCount;
 
-                    if (z != 0)
+                    if (z == size - 1)
                     {
                         topLeft--;
                         topRight--;
@@ -182,14 +192,40 @@ namespace GrassRendering
                     indices.Add(bottomRight);
                 }
             }
+            //river
+            step = 2; size = colCount / step;
+            for (x = (int)(0.7 * size); x < (int)(0.9 * size); x++)
+            {
+                for (int z = 0; z < size; z++)
+                {
+                    int topLeft = z * step + x * step * colCount;
+                    int topRight = z * step + (x + 1) * step * colCount;
 
-            x = size - 1;
+                    if (z == size - 1)
+                    {
+                        topLeft--;
+                        topRight--;
+                    }
+
+                    int bottomLeft = topLeft + step;
+                    int bottomRight = topRight + step;
+
+                    indices.Add(topLeft);
+                    indices.Add(bottomLeft);
+                    indices.Add(topRight);
+                    indices.Add(topRight);
+                    indices.Add(bottomLeft);
+                    indices.Add(bottomRight);
+                }
+            }
+            //right side of the river
+            step = colCount / 10; size = colCount / step; x = (int)(0.9 * size);
             for (int z = 0; z < size; z++)
             {
                 int topLeft = z * step + x * step * colCount;
                 int topRight = vertices.Length - (colCount - z * step);
 
-                if (z != 0)
+                if (z == size - 1)
                 {
                     topLeft--;
                     topRight--;
