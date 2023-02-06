@@ -4,6 +4,7 @@ using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System.Diagnostics;
 using GrassRendering.Controllers;
+using System.Reflection.Metadata;
 
 namespace GrassRendering
 {
@@ -14,7 +15,8 @@ namespace GrassRendering
         private Camera camera;
 
         private Terrain terrain;
-        private Grass grass;
+
+        private WaterFrameBuffers fbos;
 
         public Game(int width, int height, string title)
             : base(
@@ -41,8 +43,9 @@ namespace GrassRendering
                 new Shader(
                     Shader.GetShader("..\\..\\..\\..\\GrassRendering\\assets\\shaders\\terrain\\terrainVS.glsl", ShaderType.VertexShader),
                     Shader.GetShader("..\\..\\..\\..\\GrassRendering\\assets\\shaders\\fog\\fog.glsl", ShaderType.FragmentShader),
-                    Shader.GetShader("..\\..\\..\\..\\GrassRendering\\assets\\shaders\\terrain\\terrainFS.glsl", ShaderType.FragmentShader)),
-                out grass);
+                    Shader.GetShader("..\\..\\..\\..\\GrassRendering\\assets\\shaders\\terrain\\terrainFS.glsl", ShaderType.FragmentShader)));
+
+            fbos = new WaterFrameBuffers();
         }
 
         protected override void OnResize(ResizeEventArgs e)
@@ -67,8 +70,9 @@ namespace GrassRendering
             scheduler.timer.Stop();
 
             terrain.Unload();
-            grass.Unload();
-         
+
+            fbos.Unload();
+
             base.OnUnload();
         }
 
@@ -97,7 +101,6 @@ namespace GrassRendering
             GL.ClearColor((Color4)scheduler.current);
 
             terrain.Draw(camera, scheduler);
-            grass.Draw(camera, scheduler);
 
             Context.SwapBuffers();
             base.OnRenderFrame(args);

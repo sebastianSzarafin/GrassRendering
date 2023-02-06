@@ -6,6 +6,7 @@ layout (triangle_strip, max_vertices = 12) out;
 
 in VS_OUT {
     float texIndex;  
+	//float height;
 } gs_in[];
 
 
@@ -121,6 +122,7 @@ void createGrass(vec4 basePosition, int numberOfQuads)
 
 void main()
 {
+	//if(gs_in[0].height < 0) return;
 
     grassSize = 
         random(gl_in[0].gl_Position.xz) * (1.0 - grassMinSize) + 

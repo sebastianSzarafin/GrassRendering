@@ -21,12 +21,14 @@ namespace GrassRendering
         private Texture windText;
 
         private int VAO;
+        private int VBO;
 
-        public Grass(Vertex[] vertices, Shader shader, int VAO)
+        public Grass(Vertex[] vertices, Shader shader)
         {
             this.vertices = vertices;
             this.shader = shader;
-            this.VAO = VAO;
+
+            Setup();
 
             windText = new Texture("..\\..\\..\\..\\GrassRendering\\assets\\textures\\flowmap.png", TextureUnit.Texture0);
             grassTexts = new List<Texture>
@@ -35,6 +37,26 @@ namespace GrassRendering
             };
             for (int i = 1; i <= 4; i++)
                 grassTexts.Add(new Texture($"..\\..\\..\\..\\GrassRendering\\assets\\textures\\flower{i}_texture.png", TextureUnit.Texture0 + i + 1));
+        }
+
+        private void Setup()
+        {
+            VAO = GL.GenVertexArray();
+            VBO = GL.GenBuffer();
+
+            GL.BindVertexArray(VAO);
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, VBO);
+            GL.BufferData(BufferTarget.ArrayBuffer, vertices.Length * Marshal.SizeOf(typeof(Vertex)), vertices, BufferUsageHint.StaticDraw);
+
+            // aPosition
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Marshal.SizeOf(typeof(Vertex)), 0);
+            GL.EnableVertexAttribArray(0);
+            // aTexIndex
+            GL.VertexAttribPointer(1, 1, VertexAttribPointerType.Float, false, Marshal.SizeOf(typeof(Vertex)), Marshal.OffsetOf(typeof(Vertex), "aTexIndex"));
+            GL.EnableVertexAttribArray(1);
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
         }
 
         public void Draw(Camera camera, DayTimeScheduler scheduler)

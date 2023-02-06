@@ -20,15 +20,18 @@ namespace GrassRendering
 
         private Shader shader;
 
-        public Vertex[] vertices { get; private set; }
+        private Vertex[] vertices;
         public int[] indices;
         private Texture texTerrain;
+
+        private Grass grass;
+        private Water water;
 
         private int VAO;
         private int VBO;
         private int EBO;
 
-        public Terrain(Shader shader, out Grass grass)
+        public Terrain(Shader shader)
         {
             this.shader = shader;
 
@@ -40,15 +43,21 @@ namespace GrassRendering
             Setup();
 
             grass = new Grass(
-                vertices,
+                vertices.Where(v => v.aPosition.Y >= 0).ToArray(),
                 new Shader(
                     Shader.GetShader("..\\..\\..\\..\\GrassRendering\\assets\\shaders\\grass\\grassVS.glsl", ShaderType.VertexShader),
                     Shader.GetShader("..\\..\\..\\..\\GrassRendering\\assets\\shaders\\grass\\grassGS.glsl", ShaderType.GeometryShader),
                     Shader.GetShader("..\\..\\..\\..\\GrassRendering\\assets\\shaders\\fog\\fog.glsl", ShaderType.FragmentShader),
-                    Shader.GetShader("..\\..\\..\\..\\GrassRendering\\assets\\shaders\\grass\\grassFS.glsl", ShaderType.FragmentShader)),
-                VAO);
+                    Shader.GetShader("..\\..\\..\\..\\GrassRendering\\assets\\shaders\\grass\\grassFS.glsl", ShaderType.FragmentShader)));
+
+            water = new Water(
+                vertices.Where(v => v.aPosition.Y < 0).ToArray(),
+                new Shader(
+                    Shader.GetShader("..\\..\\..\\..\\GrassRendering\\assets\\shaders\\water\\waterVS.glsl", ShaderType.VertexShader),
+                    Shader.GetShader("..\\..\\..\\..\\GrassRendering\\assets\\shaders\\water\\waterFS.glsl", ShaderType.FragmentShader)));
         }
 
+        #region Preprocessing
         private void Setup()
         {
             VAO = GL.GenVertexArray();
@@ -78,40 +87,6 @@ namespace GrassRendering
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
         }
-
-        public void Draw(Camera camera, DayTimeScheduler scheduler)
-        {
-            int texTerrainLocation = GL.GetUniformLocation(shader.Handle, "texTerrain");
-
-            shader.Use();
-
-            GL.Uniform1(texTerrainLocation, 0);
-            texTerrain.Use(TextureUnit.Texture0);
-
-            shader.SetVector3("cameraPos", camera.position);
-            shader.SetVector4("skyColor", scheduler.current);
-            shader.SetFloat("fogDensity", scheduler.fogDensity);
-            shader.SetMatrix4("view", camera.GetViewMatrix());
-            shader.SetMatrix4("projection", camera.GetProjectionMatrix());
-
-            GL.BindVertexArray(VAO);
-            GL.DrawElements(BeginMode.Triangles, vertices.Length, DrawElementsType.UnsignedInt, 0);
-        }
-
-        public void Unload()
-        {
-            GL.BindVertexArray(0);
-            GL.DeleteVertexArray(VAO); //unbind VAO buffer
-
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0); //unbind VBO buffer
-            GL.DeleteBuffer(VBO);
-
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0); //unbind EBO buffer
-            GL.DeleteBuffer(EBO);
-
-            shader.Dispose();
-        }
-
         private int WithdrawTexture()
         {
             int range = 32; // 28 for grass and 1 per each flower
@@ -166,16 +141,16 @@ namespace GrassRendering
         private int[] ProcessIndices()
         {
             List<int> indices = new List<int>();
-            int colCount = (int)(treshhold * 2 / space), step = colCount / 10, size = colCount / step, x = 0;
+            int colCount = (int)(treshhold * 2 / space), step = colCount / 10, quads = colCount / step, x = 0;
             //left side of the river
-            for (x = 0; x < (int)(0.7 * size); x++)
+            for (x = 0; x < (int)(0.7 * quads); x++)
             {
-                for (int z = 0; z < size; z++)
+                for (int z = 0; z < quads; z++)
                 {
                     int topLeft = z * step + x * step * colCount;
                     int topRight = z * step + (x + 1) * step * colCount;
 
-                    if (z == size - 1)
+                    if (z == quads - 1)
                     {
                         topLeft--;
                         topRight--;
@@ -193,15 +168,16 @@ namespace GrassRendering
                 }
             }
             //river
-            step = 2; size = colCount / step;
-            for (x = (int)(0.7 * size); x < (int)(0.9 * size); x++)
+            step = 2; quads = colCount / step;
+            int lastGrass = indices.Count;
+            for (x = (int)(0.7 * quads); x < (int)(0.9 * quads); x++)
             {
-                for (int z = 0; z < size; z++)
+                for (int z = 0; z < quads; z++)
                 {
                     int topLeft = z * step + x * step * colCount;
                     int topRight = z * step + (x + 1) * step * colCount;
 
-                    if (z == size - 1)
+                    if (z == quads - 1)
                     {
                         topLeft--;
                         topRight--;
@@ -219,13 +195,13 @@ namespace GrassRendering
                 }
             }
             //right side of the river
-            step = colCount / 10; size = colCount / step; x = (int)(0.9 * size);
-            for (int z = 0; z < size; z++)
+            step = colCount / 10; quads = colCount / step; x = (int)(0.9 * quads);
+            for (int z = 0; z < quads; z++)
             {
                 int topLeft = z * step + x * step * colCount;
                 int topRight = vertices.Length - (colCount - z * step);
 
-                if (z == size - 1)
+                if (z == quads - 1)
                 {
                     topLeft--;
                     topRight--;
@@ -244,5 +220,45 @@ namespace GrassRendering
 
             return indices.ToArray();
         }
+        #endregion
+
+        public void Draw(Camera camera, DayTimeScheduler scheduler)
+        {
+            int texTerrainLocation = GL.GetUniformLocation(shader.Handle, "texTerrain");
+
+            shader.Use();
+
+            GL.Uniform1(texTerrainLocation, 0);
+            texTerrain.Use(TextureUnit.Texture0);
+
+            shader.SetVector3("cameraPos", camera.position);
+            shader.SetVector4("skyColor", scheduler.current);
+            shader.SetFloat("fogDensity", scheduler.fogDensity);
+            shader.SetMatrix4("view", camera.GetViewMatrix());
+            shader.SetMatrix4("projection", camera.GetProjectionMatrix());
+
+            GL.BindVertexArray(VAO);
+            GL.DrawElements(BeginMode.Triangles, indices.Length, DrawElementsType.UnsignedInt, 0);
+
+            grass.Draw(camera, scheduler);
+            water.Draw(camera, scheduler);
+        }
+
+        public void Unload()
+        {
+            GL.BindVertexArray(0);
+            GL.DeleteVertexArray(VAO); //unbind VAO buffer
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0); //unbind VBO buffer
+            GL.DeleteBuffer(VBO);
+
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0); //unbind EBO buffer
+            GL.DeleteBuffer(EBO);
+
+            shader.Dispose();
+
+            grass.Unload();
+            water.Unload();
+        }        
     }
 }
