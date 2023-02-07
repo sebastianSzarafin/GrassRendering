@@ -37,69 +37,16 @@ namespace GrassRendering
 
             refractionFrameBuffer = CreateFrameBuffer();
             refractionTexture = new Texture(TextureUnit.Texture1, PixelInternalFormat.Rgb, REFRACTION_WIDTH, REFRACTION_HEIGHT, PixelFormat.Rgb, PixelType.UnsignedByte, FramebufferAttachment.ColorAttachment0);
-            refractionDepthTexture = new Texture(TextureUnit.Texture2, PixelInternalFormat.DepthComponent, REFRACTION_WIDTH, REFRACTION_HEIGHT, PixelFormat.DepthComponent, PixelType.Float, FramebufferAttachment.DepthAttachment);
+            refractionDepthTexture = new Texture(TextureUnit.Texture10, PixelInternalFormat.DepthComponent, REFRACTION_WIDTH, REFRACTION_HEIGHT, PixelFormat.DepthComponent, PixelType.Float, FramebufferAttachment.DepthAttachment);
             UnbindCurrentFrameBuffer();
         }
 
         private int CreateFrameBuffer()
         {
             int frameBuffer = GL.GenFramebuffer();
-            //generate name for frame buffer
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, frameBuffer);
-            //create the framebuffer
             GL.DrawBuffer(DrawBufferMode.ColorAttachment0);
-            //indicate that we will always render to color attachment 0
             return frameBuffer;
-        }
-
-        private int CreateTextureAttachment(int width, int height)
-        {
-            int texture = GL.GenTexture();
-            GL.BindTexture(TextureTarget.Texture2D, texture);
-            GL.TexImage2D(
-                TextureTarget.Texture2D,
-                0,
-                PixelInternalFormat.Rgb,
-                width,
-                height,
-                0,
-                PixelFormat.Rgb,
-                PixelType.UnsignedByte,
-                (IntPtr)null);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMinFilter.LinearMipmapLinear);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.LinearMipmapLinear);
-            GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
-            GL.FramebufferTexture(
-                FramebufferTarget.Framebuffer,
-                FramebufferAttachment.ColorAttachment0,
-                texture,
-                0);
-            return texture;
-        }
-
-        private int CreateDepthTextureAttachment(int width, int height)
-        {
-            int texture = GL.GenTexture();
-            GL.BindTexture(TextureTarget.Texture2D, texture);
-            GL.TexImage2D(
-                TextureTarget.Texture2D,
-                0,
-                PixelInternalFormat.DepthComponent32,
-                width,
-                height,
-                0,
-                PixelFormat.DepthComponent,
-                PixelType.Float,
-                (IntPtr)null);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMinFilter.LinearMipmapLinear);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.LinearMipmapLinear);
-            GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
-            GL.FramebufferTexture(
-                FramebufferTarget.Framebuffer,
-                FramebufferAttachment.DepthAttachment,
-                texture,
-                0);
-            return texture;
         }
 
         private int CreateDepthBufferAttachment(int width, int height)

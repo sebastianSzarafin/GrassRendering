@@ -39,19 +39,24 @@ namespace GrassRendering.Objects
 
             Setup();
 
+            Texture windText = new Texture("..\\..\\..\\assets\\textures\\flowmap.png");
+
             grass = new Grass(
                 vertices.Where(v => v.aPosition.Y >= 0).ToArray(),
                 new Shader(
                     Shader.GetShader("..\\..\\..\\shaders\\grass\\grassVS.glsl", ShaderType.VertexShader),
                     Shader.GetShader("..\\..\\..\\shaders\\grass\\grassGS.glsl", ShaderType.GeometryShader),
                     Shader.GetShader("..\\..\\..\\shaders\\fog\\fog.glsl", ShaderType.FragmentShader),
-                    Shader.GetShader("..\\..\\..\\shaders\\grass\\grassFS.glsl", ShaderType.FragmentShader)));
+                    Shader.GetShader("..\\..\\..\\shaders\\grass\\grassFS.glsl", ShaderType.FragmentShader)),
+                windText);
 
             water = new Water(
                 vertices.Where(v => v.aPosition.Y < 0).ToArray(),
                 new Shader(
                     Shader.GetShader("..\\..\\..\\shaders\\water\\waterVS.glsl", ShaderType.VertexShader),
+                    Shader.GetShader("..\\..\\..\\shaders\\fog\\fog.glsl", ShaderType.FragmentShader),
                     Shader.GetShader("..\\..\\..\\shaders\\water\\waterFS.glsl", ShaderType.FragmentShader)),
+                windText,
                 buffers);
         }
 

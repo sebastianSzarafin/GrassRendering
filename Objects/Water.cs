@@ -26,19 +26,24 @@ namespace GrassRendering.Objects
         private int VBO;
         private int EBO;
 
-        public Water(Vertex[] vertices, Shader shader, WaterFrameBuffers buffers)
+        public Water(Vertex[] vertices, Shader shader, Texture windText, WaterFrameBuffers buffers)
         {
             this.shader = shader;
             this.vertices = vertices;
             this.buffers = buffers;
+            this.windText = windText;
+
+            /*this.vertices = new Vertex[4];
+            this.vertices[0] = new Vertex(new Vector3(4, Constants.waterHeight, -10));
+            this.vertices[1] = new Vertex(new Vector3(4, Constants.waterHeight, 10));
+            this.vertices[2] = new Vertex(new Vector3(8, Constants.waterHeight, -10));
+            this.vertices[3] = new Vertex(new Vector3(8, Constants.waterHeight, 10));*/
 
             for (int i = 0; i < vertices.Length; i++) vertices[i].aPosition.Y = Constants.waterHeight;
 
             indices = ProcessIndices();
 
-            Setup();
-
-            windText = new Texture("..\\..\\..\\assets\\textures\\flowmap.png", TextureUnit.Texture3);
+            Setup();            
         }
 
         private void Setup()
@@ -100,6 +105,10 @@ namespace GrassRendering.Objects
                 }
             }
 
+            /*List<int> indices = new List<int>()
+            {
+                0,1,2,2,1,3
+            };*/
             return indices.ToArray();
         }
 
@@ -115,10 +124,10 @@ namespace GrassRendering.Objects
             buffers.ReflectionTexture.Use(TextureUnit.Texture0);
             GL.Uniform1(texRefractLocation, 1);
             buffers.RefractionTexture.Use(TextureUnit.Texture1);
-            GL.Uniform1(texWindLocation, 3);
-            windText.Use(TextureUnit.Texture3);
+            GL.Uniform1(texWindLocation, 2);
+            windText.Use(TextureUnit.Texture2);
 
-            shader.SetFloat("time", (float)scheduler.timer.Elapsed.TotalSeconds);
+            shader.SetFloat("time", (float)scheduler.timer.Elapsed.TotalSeconds / 12);
             shader.SetVector3("cameraPos", camera.position);
             shader.SetVector4("skyColor", scheduler.current);
             shader.SetFloat("fogDensity", scheduler.fogDensity);

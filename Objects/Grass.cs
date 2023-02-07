@@ -24,20 +24,20 @@ namespace GrassRendering.Objects
         private int VAO;
         private int VBO;
 
-        public Grass(Vertex[] vertices, Shader shader)
+        public Grass(Vertex[] vertices, Shader shader, Texture windText)
         {
             this.vertices = vertices;
             this.shader = shader;
+            this.windText = windText;
 
-            Setup();
-
-            windText = new Texture("..\\..\\..\\assets\\textures\\flowmap.png", TextureUnit.Texture0);
             grassTexts = new List<Texture>
             {
                 new Texture($"..\\..\\..\\assets\\textures\\grass1_texture.png", TextureUnit.Texture1)
             };
             for (int i = 1; i <= 4; i++)
                 grassTexts.Add(new Texture($"..\\..\\..\\assets\\textures\\flower{i}_texture.png", TextureUnit.Texture0 + i + 1));
+            
+            Setup();
         }
 
         private void Setup()

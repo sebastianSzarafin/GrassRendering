@@ -13,6 +13,7 @@ uniform  vec4 plane;
 out vec2 texCoord;
 out float distanceFromCamera;
 
+const float tiling = 10.0;
 
 void main() {
 	gl_ClipDistance[0] = dot( vec4(aPosition, 1.0), plane);
@@ -20,5 +21,5 @@ void main() {
 	gl_Position = vec4(aPosition, 1.0) * view * projection;
 
 	distanceFromCamera = length(aPosition - cameraPos);
-    texCoord = aTexCoord * 10.0;
+    texCoord = aTexCoord * tiling;
 }

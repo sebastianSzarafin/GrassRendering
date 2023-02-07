@@ -124,6 +124,7 @@ namespace GrassRendering
             terrain.Draw(camera, scheduler, new Vector4(0, -1, 0, Constants.waterHeight));
             GL.Finish();
 
+
             GL.Disable(EnableCap.ClipDistance0);
             // render to screen
             buffers.UnbindCurrentFrameBuffer();
