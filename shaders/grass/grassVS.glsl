@@ -4,6 +4,7 @@ layout (location = 0) in vec3 aPosition;
 layout (location = 1) in float aTexIndex;
 
 out VS_OUT {
+	vec3 position;
 	float texIndex;    
 	//float height;
 } vs_out;

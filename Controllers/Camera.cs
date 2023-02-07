@@ -18,12 +18,12 @@ namespace GrassRendering.Controllers
         public Vector3 position;
         public Vector3 up;
         public Vector3 front;
-        public float aspectRatio { get; set; }
-        private float fov { get; set; }
+        public float aspectRatio;
+        private float fov;
         public Vector3 right;
 
-        private float pitch { get; set; }
-        private float yaw { get; set; }
+        private float pitch;
+        private float yaw;
 
         private Mouse mouse;
         #endregion
@@ -53,6 +53,10 @@ namespace GrassRendering.Controllers
         }
 
         #region Camera Movements
+        public void InvertPitch()
+        {
+            Pitch *= -1;
+        }
         public float Pitch
         {
             get => MathHelper.RadiansToDegrees(pitch);

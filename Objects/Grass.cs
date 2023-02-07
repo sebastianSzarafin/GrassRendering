@@ -1,4 +1,5 @@
 ﻿using GrassRendering.Controllers;
+using GrassRendering.shaders;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System;
@@ -10,7 +11,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GrassRendering
+namespace GrassRendering.Objects
 {
     internal class Grass
     {
@@ -30,13 +31,13 @@ namespace GrassRendering
 
             Setup();
 
-            windText = new Texture("..\\..\\..\\..\\GrassRendering\\assets\\textures\\flowmap.png", TextureUnit.Texture0);
+            windText = new Texture("..\\..\\..\\assets\\textures\\flowmap.png", TextureUnit.Texture0);
             grassTexts = new List<Texture>
             {
-                new Texture($"..\\..\\..\\..\\GrassRendering\\assets\\textures\\grass1_texture.png", TextureUnit.Texture1)
+                new Texture($"..\\..\\..\\assets\\textures\\grass1_texture.png", TextureUnit.Texture1)
             };
             for (int i = 1; i <= 4; i++)
-                grassTexts.Add(new Texture($"..\\..\\..\\..\\GrassRendering\\assets\\textures\\flower{i}_texture.png", TextureUnit.Texture0 + i + 1));
+                grassTexts.Add(new Texture($"..\\..\\..\\assets\\textures\\flower{i}_texture.png", TextureUnit.Texture0 + i + 1));
         }
 
         private void Setup()
@@ -59,11 +60,11 @@ namespace GrassRendering
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
         }
 
-        public void Draw(Camera camera, DayTimeScheduler scheduler)
+        public void Draw(Camera camera, DayTimeScheduler scheduler, Vector4? plane = null)
         {
             int texWindLocation = GL.GetUniformLocation(shader.Handle, "texWind");
             int[] texGrassLocations = new int[grassTexts.Count];
-            for(int i = 0; i < grassTexts.Count; i++)
+            for (int i = 0; i < grassTexts.Count; i++)
             {
                 texGrassLocations[i] = GL.GetUniformLocation(shader.Handle, $"texGrass{i + 1}");
             }
@@ -82,6 +83,7 @@ namespace GrassRendering
             shader.SetVector3("cameraPos", camera.position);
             shader.SetVector4("skyColor", scheduler.current);
             shader.SetFloat("fogDensity", scheduler.fogDensity);
+            if (plane != null) shader.SetVector4("plane", (Vector4)plane);
 
             shader.SetMatrix4("view", camera.GetViewMatrix());
             shader.SetMatrix4("projection", camera.GetProjectionMatrix());

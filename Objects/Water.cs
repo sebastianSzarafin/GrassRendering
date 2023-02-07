@@ -1,41 +1,44 @@
 ﻿using GrassRendering.Controllers;
+using GrassRendering.shaders;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GrassRendering
+namespace GrassRendering.Objects
 {
     internal class Water
     {
-        private const float treshhold = 10.0f;
-        private const float space = 0.2f;
-
         private Shader shader;
 
         private Vertex[] vertices;
-        public int[] indices;
+        private int[] indices;
+        private WaterFrameBuffers buffers;
         //private List<Texture> grassTexts;
-        //private Texture windText;
+        private Texture windText;
 
         private int VAO;
         private int VBO;
         private int EBO;
 
-        public Water(Vertex[] vertices, Shader shader)
+        public Water(Vertex[] vertices, Shader shader, WaterFrameBuffers buffers)
         {
             this.shader = shader;
             this.vertices = vertices;
+            this.buffers = buffers;
 
-            for (int i = 0; i < vertices.Length; i++) vertices[i].aPosition.Y = -0.15f;
+            for (int i = 0; i < vertices.Length; i++) vertices[i].aPosition.Y = Constants.waterHeight;
 
             indices = ProcessIndices();
 
             Setup();
+
+            windText = new Texture("..\\..\\..\\assets\\textures\\flowmap.png", TextureUnit.Texture3);
         }
 
         private void Setup()
@@ -71,7 +74,7 @@ namespace GrassRendering
         private int[] ProcessIndices()
         {
             List<int> indices = new List<int>();
-            int colCount = (int)(treshhold * 2 / space), step = 2, quadsInCol = colCount / step, quadsInRow = (int)(0.4 * quadsInCol / step);
+            int colCount = (int)(Constants.treshhold * 2 / Constants.space), step = 2, quadsInCol = colCount / step, quadsInRow = (int)(0.4 * quadsInCol / step);
             for (int x = 0; x < quadsInRow - 1; x++)
             {
                 for (int z = 0; z < quadsInCol; z++)
@@ -100,14 +103,26 @@ namespace GrassRendering
             return indices.ToArray();
         }
 
-        public void Draw(Camera camera, DayTimeScheduler scheduler)
+        public void Draw(Camera camera, DayTimeScheduler scheduler, Vector4? plane)
         {
+            int texReflectLocation = GL.GetUniformLocation(shader.Handle, "texReflect");
+            int texRefractLocation = GL.GetUniformLocation(shader.Handle, "texRefract");
+            int texWindLocation = GL.GetUniformLocation(shader.Handle, "texWind");
+
             shader.Use();
+
+            GL.Uniform1(texReflectLocation, 0);
+            buffers.ReflectionTexture.Use(TextureUnit.Texture0);
+            GL.Uniform1(texRefractLocation, 1);
+            buffers.RefractionTexture.Use(TextureUnit.Texture1);
+            GL.Uniform1(texWindLocation, 3);
+            windText.Use(TextureUnit.Texture3);
 
             shader.SetFloat("time", (float)scheduler.timer.Elapsed.TotalSeconds);
             shader.SetVector3("cameraPos", camera.position);
             shader.SetVector4("skyColor", scheduler.current);
             shader.SetFloat("fogDensity", scheduler.fogDensity);
+            if (plane != null) shader.SetVector4("plane", (Vector4)plane);
 
             shader.SetMatrix4("view", camera.GetViewMatrix());
             shader.SetMatrix4("projection", camera.GetProjectionMatrix());

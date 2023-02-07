@@ -5,6 +5,7 @@ layout (triangle_strip, max_vertices = 12) out;
 
 
 in VS_OUT {
+	vec3 position;
     float texIndex;  
 	//float height;
 } gs_in[];
@@ -23,6 +24,8 @@ uniform mat4 projection;
 uniform vec3 cameraPos;
 uniform float time;
 uniform sampler2D texWind;
+uniform  vec4 plane;
+
 
 /*CONSTANTS*/
 const float PI = 3.141592653589793;
@@ -122,6 +125,7 @@ void createGrass(vec4 basePosition, int numberOfQuads)
 
 void main()
 {
+	gl_ClipDistance[0] = dot( vec4(gs_in[0].position, 1.0), plane);
 	//if(gs_in[0].height < 0) return;
 
     grassSize = 

@@ -5,7 +5,7 @@ namespace GrassRendering
 {
     public class Texture
     {
-        public int handle;
+        private int handle;
         public string type = "";
         public string path = "";
 
@@ -36,10 +36,44 @@ namespace GrassRendering
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureLodBias, -0.4f);
         }
 
+        public Texture(TextureUnit unit, PixelInternalFormat internalFormat, int width, int height, PixelFormat format, PixelType type, FramebufferAttachment attachment)
+        {
+            handle = GL.GenTexture();
+            GL.BindTexture(TextureTarget.Texture2D, handle);
+
+            Use(unit);
+
+            GL.TexImage2D(
+                TextureTarget.Texture2D,
+                0,
+                internalFormat,
+                width,
+                height,
+                0,
+                format,
+                type,
+                (IntPtr)null);
+
+            GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMinFilter.LinearMipmapLinear);
+            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.LinearMipmapLinear);
+
+            GL.FramebufferTexture(
+                FramebufferTarget.Framebuffer,
+                attachment,
+                handle,
+                0);
+        }
+
         public void Use(TextureUnit unit)
         {
             GL.ActiveTexture(unit);
             GL.BindTexture(TextureTarget.Texture2D, handle);
+        }
+
+        public void Unload()
+        {
+            GL.DeleteTexture(handle);
         }
     }
 }

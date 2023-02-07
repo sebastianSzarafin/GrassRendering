@@ -8,11 +8,15 @@ layout (location = 2) in vec2 aTexCoord;
 uniform vec3 cameraPos;
 uniform mat4 view;
 uniform mat4 projection;
+uniform  vec4 plane;
 
 out vec2 texCoord;
 out float distanceFromCamera;
 
+
 void main() {
+	gl_ClipDistance[0] = dot( vec4(aPosition, 1.0), plane);
+
 	gl_Position = vec4(aPosition, 1.0) * view * projection;
 
 	distanceFromCamera = length(aPosition - cameraPos);

@@ -10,39 +10,34 @@ namespace GrassRendering
 {
     internal class WaterFrameBuffers
     {
-        private const int REFLECTION_WIDTH = 320;
-        private const int REFLECTION_HEIGHT = 180;
+        private const int REFLECTION_WIDTH = 1280;
+        private const int REFLECTION_HEIGHT = 720;
 
         private const int REFRACTION_WIDTH = 1280;
         private const int REFRACTION_HEIGHT = 720;
 
         private int reflectionFrameBuffer;
-        public int reflectionTexture { get; private set; }
+        private Texture reflectionTexture;
         private int reflectionDepthBuffer;
 
         private int refractionFrameBuffer;
-        public int refractionTexture { get; private set; }
-        public int refractionDepthTexture { get; private set; }
+        private Texture refractionTexture;
+        private Texture refractionDepthTexture;
+
+        public Texture ReflectionTexture { get => reflectionTexture; }
+        public Texture RefractionTexture { get => refractionTexture; }
+        public Texture RefractionDepthTexture { get => refractionDepthTexture; }
 
         public WaterFrameBuffers()
-        {//call when loading the game
-            InitialiseReflectionFrameBuffer();
-            InitialiseRefractionFrameBuffer();
-        }
-
-        private void InitialiseReflectionFrameBuffer()
         {
             reflectionFrameBuffer = CreateFrameBuffer();
-            reflectionTexture = CreateTextureAttachment(REFLECTION_WIDTH, REFLECTION_HEIGHT);
+            reflectionTexture = new Texture(TextureUnit.Texture0, PixelInternalFormat.Rgb, REFLECTION_WIDTH, REFLECTION_HEIGHT, PixelFormat.Rgb, PixelType.UnsignedByte, FramebufferAttachment.ColorAttachment0);
             reflectionDepthBuffer = CreateDepthBufferAttachment(REFLECTION_WIDTH, REFLECTION_HEIGHT);
             UnbindCurrentFrameBuffer();
-        }
 
-        private void InitialiseRefractionFrameBuffer()
-        {
             refractionFrameBuffer = CreateFrameBuffer();
-            refractionTexture = CreateTextureAttachment(REFRACTION_WIDTH, REFRACTION_HEIGHT);
-            refractionDepthTexture = CreateDepthTextureAttachment(REFRACTION_WIDTH, REFRACTION_HEIGHT);
+            refractionTexture = new Texture(TextureUnit.Texture1, PixelInternalFormat.Rgb, REFRACTION_WIDTH, REFRACTION_HEIGHT, PixelFormat.Rgb, PixelType.UnsignedByte, FramebufferAttachment.ColorAttachment0);
+            refractionDepthTexture = new Texture(TextureUnit.Texture2, PixelInternalFormat.DepthComponent, REFRACTION_WIDTH, REFRACTION_HEIGHT, PixelFormat.DepthComponent, PixelType.Float, FramebufferAttachment.DepthAttachment);
             UnbindCurrentFrameBuffer();
         }
 
@@ -62,8 +57,8 @@ namespace GrassRendering
             int texture = GL.GenTexture();
             GL.BindTexture(TextureTarget.Texture2D, texture);
             GL.TexImage2D(
-                TextureTarget.Texture2D, 
-                0, 
+                TextureTarget.Texture2D,
+                0,
                 PixelInternalFormat.Rgb,
                 width,
                 height,
@@ -73,10 +68,11 @@ namespace GrassRendering
                 (IntPtr)null);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMinFilter.LinearMipmapLinear);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.LinearMipmapLinear);
+            GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
             GL.FramebufferTexture(
-                FramebufferTarget.Framebuffer, 
+                FramebufferTarget.Framebuffer,
                 FramebufferAttachment.ColorAttachment0,
-                texture, 
+                texture,
                 0);
             return texture;
         }
@@ -97,6 +93,7 @@ namespace GrassRendering
                 (IntPtr)null);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMinFilter.LinearMipmapLinear);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.LinearMipmapLinear);
+            GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
             GL.FramebufferTexture(
                 FramebufferTarget.Framebuffer,
                 FramebufferAttachment.DepthAttachment,
@@ -136,17 +133,16 @@ namespace GrassRendering
         {//call to switch to default frame buffer
             GL.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
             GL.Viewport(0, 0, 1280, 720);
-            GL.Finish();
         }
 
         public void Unload()
         {
             GL.DeleteFramebuffer(reflectionFrameBuffer);
-            GL.DeleteTexture(reflectionTexture);
+            reflectionTexture.Unload();
             GL.DeleteRenderbuffer(reflectionDepthBuffer);
             GL.DeleteFramebuffer(refractionFrameBuffer);
-            GL.DeleteTexture(refractionTexture);
-            GL.DeleteTexture(refractionDepthTexture);
+            refractionTexture.Unload();
+            refractionDepthTexture.Unload();
         }
     }
 }

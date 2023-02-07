@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GrassRendering
+namespace GrassRendering.shaders
 {
     public class Shader : IDisposable
     {
@@ -19,7 +19,7 @@ namespace GrassRendering
         {
             Handle = GL.CreateProgram();
 
-            foreach(int shader in shaders) GL.AttachShader(Handle, shader);
+            foreach (int shader in shaders) GL.AttachShader(Handle, shader);
             GL.LinkProgram(Handle);
             {
                 GL.GetProgram(Handle, GetProgramParameterName.LinkStatus, out int success);

@@ -1,5 +1,5 @@
-﻿using GrassRendering;
-using GrassRendering.Controllers;
+﻿using GrassRendering.Controllers;
+using GrassRendering.shaders;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System;
@@ -11,13 +11,10 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GrassRendering
+namespace GrassRendering.Objects
 {
     internal class Terrain
     {
-        private const float treshhold = 10.0f;
-        private const float space = 0.2f;
-
         private Shader shader;
 
         private Vertex[] vertices;
@@ -31,11 +28,11 @@ namespace GrassRendering
         private int VBO;
         private int EBO;
 
-        public Terrain(Shader shader)
+        public Terrain(Shader shader, WaterFrameBuffers buffers)
         {
             this.shader = shader;
 
-            texTerrain = new Texture("..\\..\\..\\..\\GrassRendering\\assets\\textures\\terrain.png", TextureUnit.Texture0);
+            texTerrain = new Texture("..\\..\\..\\assets\\textures\\terrain.png", TextureUnit.Texture0);
 
             vertices = ProcessVertices();
             indices = ProcessIndices();
@@ -45,16 +42,17 @@ namespace GrassRendering
             grass = new Grass(
                 vertices.Where(v => v.aPosition.Y >= 0).ToArray(),
                 new Shader(
-                    Shader.GetShader("..\\..\\..\\..\\GrassRendering\\assets\\shaders\\grass\\grassVS.glsl", ShaderType.VertexShader),
-                    Shader.GetShader("..\\..\\..\\..\\GrassRendering\\assets\\shaders\\grass\\grassGS.glsl", ShaderType.GeometryShader),
-                    Shader.GetShader("..\\..\\..\\..\\GrassRendering\\assets\\shaders\\fog\\fog.glsl", ShaderType.FragmentShader),
-                    Shader.GetShader("..\\..\\..\\..\\GrassRendering\\assets\\shaders\\grass\\grassFS.glsl", ShaderType.FragmentShader)));
+                    Shader.GetShader("..\\..\\..\\shaders\\grass\\grassVS.glsl", ShaderType.VertexShader),
+                    Shader.GetShader("..\\..\\..\\shaders\\grass\\grassGS.glsl", ShaderType.GeometryShader),
+                    Shader.GetShader("..\\..\\..\\shaders\\fog\\fog.glsl", ShaderType.FragmentShader),
+                    Shader.GetShader("..\\..\\..\\shaders\\grass\\grassFS.glsl", ShaderType.FragmentShader)));
 
             water = new Water(
                 vertices.Where(v => v.aPosition.Y < 0).ToArray(),
                 new Shader(
-                    Shader.GetShader("..\\..\\..\\..\\GrassRendering\\assets\\shaders\\water\\waterVS.glsl", ShaderType.VertexShader),
-                    Shader.GetShader("..\\..\\..\\..\\GrassRendering\\assets\\shaders\\water\\waterFS.glsl", ShaderType.FragmentShader)));
+                    Shader.GetShader("..\\..\\..\\shaders\\water\\waterVS.glsl", ShaderType.VertexShader),
+                    Shader.GetShader("..\\..\\..\\shaders\\water\\waterFS.glsl", ShaderType.FragmentShader)),
+                buffers);
         }
 
         #region Preprocessing
@@ -112,16 +110,16 @@ namespace GrassRendering
         private Vertex[] ProcessVertices()
         {
             List<Vertex> vertices = new List<Vertex>();
-            for (float x = -treshhold; x < treshhold; x = (float)Math.Round(x + space, 2))
+            for (float x = -Constants.treshhold; x < Constants.treshhold; x = (float)Math.Round(x + Constants.space, 2))
             {
-                float y = getHeight(x, 4f / 10f * treshhold, 8f / 10f * treshhold);
-                for (float z = -treshhold; z < treshhold; z = (float)Math.Round(z + space, 2))
+                float y = getHeight(x, 4f / 10f * Constants.treshhold, 8f / 10f * Constants.treshhold);
+                for (float z = -Constants.treshhold; z < Constants.treshhold; z = (float)Math.Round(z + Constants.space, 2))
                 {
                     vertices.Add(
                         new Vertex(
                             new Vector3(x, y, z),
                             Vector3.UnitY,
-                            new Vector2(Math.Abs(x) / treshhold, Math.Abs(z) / treshhold),
+                            new Vector2(Math.Abs(x) / Constants.treshhold, Math.Abs(z) / Constants.treshhold),
                             WithdrawTexture()));
                 }
             }
@@ -133,7 +131,7 @@ namespace GrassRendering
                 if (x < begin || x > end) return 0.0f;
 
                 float a = (float)(-Math.PI / 2), b = -a;
-                float height = (float)-Math.Cos((b - a) * (x - begin) / (end - begin) + a) * treshhold / 10.0f;
+                float height = (float)-Math.Cos((b - a) * (x - begin) / (end - begin) + a) * Constants.treshhold / 10.0f;
                 return Math.Min(height, 0);
             }
         }
@@ -141,7 +139,7 @@ namespace GrassRendering
         private int[] ProcessIndices()
         {
             List<int> indices = new List<int>();
-            int colCount = (int)(treshhold * 2 / space), step = colCount / 10, quads = colCount / step, x = 0;
+            int colCount = (int)(Constants.treshhold * 2 / Constants.space), step = colCount / 10, quads = colCount / step, x = 0;
             //left side of the river
             for (x = 0; x < (int)(0.7 * quads); x++)
             {
@@ -222,7 +220,7 @@ namespace GrassRendering
         }
         #endregion
 
-        public void Draw(Camera camera, DayTimeScheduler scheduler)
+        public void Draw(Camera camera, DayTimeScheduler scheduler, Vector4? plane = null)
         {
             int texTerrainLocation = GL.GetUniformLocation(shader.Handle, "texTerrain");
 
@@ -236,12 +234,13 @@ namespace GrassRendering
             shader.SetFloat("fogDensity", scheduler.fogDensity);
             shader.SetMatrix4("view", camera.GetViewMatrix());
             shader.SetMatrix4("projection", camera.GetProjectionMatrix());
+            if (plane != null) shader.SetVector4("plane", (Vector4)plane);
 
             GL.BindVertexArray(VAO);
             GL.DrawElements(BeginMode.Triangles, indices.Length, DrawElementsType.UnsignedInt, 0);
 
-            grass.Draw(camera, scheduler);
-            water.Draw(camera, scheduler);
+            grass.Draw(camera, scheduler, plane);
+            water.Draw(camera, scheduler, plane);
         }
 
         public void Unload()
@@ -259,6 +258,6 @@ namespace GrassRendering
 
             grass.Unload();
             water.Unload();
-        }        
+        }
     }
 }

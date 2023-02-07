@@ -6,13 +6,17 @@ layout (location = 2) in vec2 aTexCoord;
 uniform mat4 view;
 uniform mat4 projection;
 
+uniform  vec4 plane;
+
 //out VS_OUT {
 //    vec2 texCoord;
 //} vs_out;
 
-void main()
-{
-    gl_Position = vec4(aPosition, 1.0) * view * projection;
+out vec4 clipSpace;
 
-    //vs_out.texCoord = aTexCoord;
+void main() {
+    gl_ClipDistance[0] = dot( vec4(aPosition, 1.0), plane);
+
+    clipSpace = vec4(aPosition, 1.0) * view * projection;
+    gl_Position = clipSpace;
 }
