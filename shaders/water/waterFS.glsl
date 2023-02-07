@@ -17,9 +17,10 @@ uniform sampler2D texRefract;
 uniform sampler2D texWind;
 uniform float time;
 
+/*CONSTANTS*/
 const float waveStrength = 0.001;
 
-/* FUNCTIONS */
+/*FUNCTIONS*/
 float getVisibility(float, float);
 
 void main()
@@ -29,10 +30,11 @@ void main()
     vec2 reflectTexCoord = vec2(ndc.x, -ndc.y);
     vec2 refractTexCoord = ndc;
 
+    float move = time / 12;
     vec2 distortion = 
-        (texture(texWind, vec2(fs_in.texCoord.x, fs_in.texCoord.y - time)).rg * 2.0 - 1.0) * waveStrength +
-        (texture(texWind, vec2(-fs_in.texCoord.x - time, fs_in.texCoord.y - time)).rg * 2.0 - 1.0) * waveStrength +
-        (texture(texWind, vec2(-fs_in.texCoord.x + time, fs_in.texCoord.y - time)).rg * 2.0 - 1.0) * waveStrength;
+        ((texture(texWind, vec2(fs_in.texCoord.x, fs_in.texCoord.y - move)).rg * 2.0 - 1.0) +
+        (texture(texWind, vec2(-fs_in.texCoord.x - move, fs_in.texCoord.y - move)).rg * 2.0 - 1.0) +
+        (texture(texWind, vec2(-fs_in.texCoord.x + move, fs_in.texCoord.y - move)).rg * 2.0 - 1.0))  * waveStrength;
 
 
     reflectTexCoord += distortion;

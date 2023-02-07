@@ -172,7 +172,6 @@ namespace GrassRendering.Objects
             }
             //river
             step = 2; quads = colCount / step;
-            int lastGrass = indices.Count;
             for (x = (int)(0.7 * quads); x < (int)(0.9 * quads); x++)
             {
                 for (int z = 0; z < quads; z++)
@@ -234,12 +233,14 @@ namespace GrassRendering.Objects
             GL.Uniform1(texTerrainLocation, 0);
             texTerrain.Use(TextureUnit.Texture0);
 
+            shader.SetFloat("time", (float)scheduler.timer.Elapsed.TotalSeconds);
             shader.SetVector3("cameraPos", camera.position);
             shader.SetVector4("skyColor", scheduler.current);
             shader.SetFloat("fogDensity", scheduler.fogDensity);
+            if (plane != null) shader.SetVector4("plane", (Vector4)plane);
+
             shader.SetMatrix4("view", camera.GetViewMatrix());
             shader.SetMatrix4("projection", camera.GetProjectionMatrix());
-            if (plane != null) shader.SetVector4("plane", (Vector4)plane);
 
             GL.BindVertexArray(VAO);
             GL.DrawElements(BeginMode.Triangles, indices.Length, DrawElementsType.UnsignedInt, 0);

@@ -38,8 +38,6 @@ const float windStrength = 0.02;
 const float deflectionFactor = 0.25;
 const float leanFactor = 0.1;
 
-
-
 /*PARAMETERS*/
 float grassSize;
 

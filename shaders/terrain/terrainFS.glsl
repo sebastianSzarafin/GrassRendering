@@ -9,7 +9,7 @@ uniform sampler2D texTerrain;
 
 out vec4 outColor;
 
-/* FUNCTIONS */
+/*FUNCTIONS*/
 float getVisibility(float, float);
 
 void main()

@@ -1,6 +1,5 @@
 #version 330 core
 
-out vec4 outColor;
 
 in GS_OUT {
     vec2 texCoord;
@@ -8,6 +7,8 @@ in GS_OUT {
 	float texIndex;
 	float distanceFromCamera;
 } fs_in;
+
+out vec4 outColor;
 
 uniform vec4 skyColor;
 uniform float fogDensity;
@@ -20,7 +21,7 @@ uniform sampler2D texGrass5;
 /*CONSTANTS*/
 float texBorderDetail = 0.1;
 
-/* USEFUL FUNCTIONS */
+/*FUNCTIONS*/
 vec4 mapTexture();
 bool isTexBorder(vec3);
 float getVisibility(float, float);

@@ -7,6 +7,7 @@ using GrassRendering.Controllers;
 using System.Reflection.Metadata;
 using GrassRendering.Objects;
 using GrassRendering.shaders;
+using GrassRendering.Renderers;
 
 namespace GrassRendering
 {
@@ -16,9 +17,7 @@ namespace GrassRendering
 
         private Camera camera;
 
-        private Terrain terrain;
-
-        private WaterFrameBuffers buffers;
+        private MainRenderer renderer;
 
         public Game(int width, int height, string title)
             : base(
@@ -39,17 +38,9 @@ namespace GrassRendering
 
             scheduler = new DayTimeScheduler(DayTime.Morning);
 
-            camera = new Camera(new Vector3(0.0f, 1.0f, 3.0f), Size.X / (float)Size.Y);            
+            camera = new Camera(new Vector3(0.0f, 1.0f, 3.0f), Size.X / (float)Size.Y);
 
-            buffers = new WaterFrameBuffers();
-
-            terrain = new Terrain(
-                new Shader(
-                    Shader.GetShader("..\\..\\..\\shaders\\terrain\\terrainVS.glsl", ShaderType.VertexShader),
-                    Shader.GetShader("..\\..\\..\\shaders\\fog\\fog.glsl", ShaderType.FragmentShader),
-                    Shader.GetShader("..\\..\\..\\shaders\\terrain\\terrainFS.glsl", ShaderType.FragmentShader)),
-                buffers);
-
+            renderer = new MainRenderer();
         }
 
         protected override void OnResize(ResizeEventArgs e)
@@ -61,6 +52,7 @@ namespace GrassRendering
         protected override void OnLoad()
         {
             scheduler.timer.Start();
+
             CursorState = CursorState.Grabbed;
             IsVisible = true;
 
@@ -73,9 +65,7 @@ namespace GrassRendering
         {
             scheduler.timer.Stop();
 
-            terrain.Unload();
-
-            buffers.Unload();
+            renderer.Unload();
 
             base.OnUnload();
         }
@@ -101,37 +91,7 @@ namespace GrassRendering
 
         protected override void OnRenderFrame(FrameEventArgs args)
         {
-            GL.Enable(EnableCap.ClipDistance0);
-            // render reflection texture
-            buffers.BindReflectionFrameBuffer();
-
-            float distance = 2 * (camera.position.Y - Constants.waterHeight);
-            camera.position.Y -= distance;
-            camera.InvertPitch();
-
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            terrain.Draw(camera, scheduler, new Vector4(0, 1, 0, -(Constants.waterHeight + 0.001f)));
-            GL.Finish();
-
-            camera.position.Y += distance;
-           camera.InvertPitch();
-
-
-            // render refraction texture
-            buffers.BindRefractionFrameBuffer();
-
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            terrain.Draw(camera, scheduler, new Vector4(0, -1, 0, Constants.waterHeight));
-            GL.Finish();
-
-
-            GL.Disable(EnableCap.ClipDistance0);
-            // render to screen
-            buffers.UnbindCurrentFrameBuffer();
-
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            GL.ClearColor((Color4)scheduler.current);
-            terrain.Draw(camera, scheduler);
+            renderer.Draw(camera, scheduler);
 
             Context.SwapBuffers();
             base.OnRenderFrame(args);

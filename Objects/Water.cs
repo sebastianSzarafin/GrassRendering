@@ -127,7 +127,7 @@ namespace GrassRendering.Objects
             GL.Uniform1(texWindLocation, 2);
             windText.Use(TextureUnit.Texture2);
 
-            shader.SetFloat("time", (float)scheduler.timer.Elapsed.TotalSeconds / 12);
+            shader.SetFloat("time", (float)scheduler.timer.Elapsed.TotalSeconds);
             shader.SetVector3("cameraPos", camera.position);
             shader.SetVector4("skyColor", scheduler.current);
             shader.SetFloat("fogDensity", scheduler.fogDensity);
