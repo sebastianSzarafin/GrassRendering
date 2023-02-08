@@ -5,9 +5,8 @@ using OpenTK.Mathematics;
 using System.Diagnostics;
 using GrassRendering.Controllers;
 using System.Reflection.Metadata;
-using GrassRendering.Objects;
-using GrassRendering.shaders;
-using GrassRendering.Renderers;
+using GrassRendering.Models;
+using GrassRendering.Rendering;
 
 namespace GrassRendering
 {

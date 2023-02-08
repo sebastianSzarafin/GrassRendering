@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GrassRendering.shaders
+namespace GrassRendering.Rendering
 {
     public class Shader : IDisposable
     {

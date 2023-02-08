@@ -1,6 +1,6 @@
 ﻿using GrassRendering.Controllers;
-using GrassRendering.Objects;
-using GrassRendering.shaders;
+using GrassRendering.Models;
+using GrassRendering.Models.Interfaces;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System;
@@ -10,11 +10,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GrassRendering.Renderers
+namespace GrassRendering.Rendering
 {
     internal class MainRenderer
     {
-        private Terrain terrain;
+        private List<IModel> models;
 
         private WaterFrameBuffers buffers;
 
@@ -22,12 +22,10 @@ namespace GrassRendering.Renderers
         {
             buffers = new WaterFrameBuffers();
 
-            terrain = new Terrain(
-                new Shader(
-                    Shader.GetShader("..\\..\\..\\shaders\\terrain\\terrainVS.glsl", ShaderType.VertexShader),
-                    Shader.GetShader("..\\..\\..\\shaders\\fog\\fog.glsl", ShaderType.FragmentShader),
-                    Shader.GetShader("..\\..\\..\\shaders\\terrain\\terrainFS.glsl", ShaderType.FragmentShader)),
-                buffers);
+            models = new List<IModel>()
+            {
+                new Terrain(buffers),
+            };
         }
 
         public void Draw(Camera camera, DayTimeScheduler scheduler)
@@ -52,7 +50,10 @@ namespace GrassRendering.Renderers
             camera.InvertPitch();
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            terrain.Draw(camera, scheduler, new Vector4(0, 1, 0, -(Constants.waterHeight + 0.001f)));
+            foreach (IModel model in models)
+            {
+                model.Draw(camera, scheduler, new Vector4(0, 1, 0, -(Constants.waterHeight + 0.001f)));
+            }
             GL.Finish();
 
             camera.position.Y += distance;
@@ -64,7 +65,10 @@ namespace GrassRendering.Renderers
             buffers.BindRefractionFrameBuffer();
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            terrain.Draw(camera, scheduler, new Vector4(0, -1, 0, Constants.waterHeight));
+            foreach (IModel model in models)
+            {
+                model.Draw(camera, scheduler, new Vector4(0, -1, 0, Constants.waterHeight));
+            }
             GL.Finish();
         }
 
@@ -74,14 +78,18 @@ namespace GrassRendering.Renderers
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.ClearColor((Color4)scheduler.current);
-            terrain.Draw(camera, scheduler);
+            foreach (IModel model in models)
+            {
+                model.Draw(camera, scheduler);
+            }
         }
 
         public void Unload()
         {
-            terrain.Unload();
+            foreach (IModel model in models) model.Unload();
 
             buffers.Unload();
         }
     }
 }
+

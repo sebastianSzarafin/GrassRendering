@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GrassRendering
+namespace GrassRendering.Controllers
 {
     public enum DayTime
     {
@@ -18,14 +18,14 @@ namespace GrassRendering
     }
     internal class DayTimeScheduler
     {
-        public const float day = 60; 
+        public const float day = 60;
         public const int dayTimes = 4;
 
         private Vector4[] colors;
 
         public float mix;
         public DayTime time;
-        public Vector4 current 
+        public Vector4 current
         {
             get
             {
@@ -72,9 +72,9 @@ namespace GrassRendering
             const double period = day / dayTimes;
             double dayPart = timer.Elapsed.TotalSeconds % day;
 
-            switch(dayPart)
+            switch (dayPart)
             {
-                case <= period:                    
+                case <= period:
                     time = DayTime.Morning;
                     break;
                 case <= period * 2:
@@ -88,7 +88,7 @@ namespace GrassRendering
                     break;
             }
 
-            mix = (float)(dayPart % (period) / period);
+            mix = (float)(dayPart % period / period);
         }
     }
 }

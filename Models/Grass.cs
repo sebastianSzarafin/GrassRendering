@@ -1,5 +1,6 @@
 ﻿using GrassRendering.Controllers;
-using GrassRendering.shaders;
+using GrassRendering.Models.Interfaces;
+using GrassRendering.Rendering;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using System;
@@ -11,12 +12,10 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GrassRendering.Objects
+namespace GrassRendering.Models
 {
-    internal class Grass
+    internal class Grass : IMesh
     {
-        private Shader shader;
-
         private Vertex[] vertices;
         private List<Texture> grassTexts;
         private Texture windText;
@@ -24,10 +23,9 @@ namespace GrassRendering.Objects
         private int VAO;
         private int VBO;
 
-        public Grass(Vertex[] vertices, Shader shader, Texture windText)
+        public Grass(Vertex[] vertices, Texture windText)
         {
             this.vertices = vertices;
-            this.shader = shader;
             this.windText = windText;
 
             grassTexts = new List<Texture>
@@ -40,6 +38,7 @@ namespace GrassRendering.Objects
             Setup();
         }
 
+        #region Preprocessing
         private void Setup()
         {
             VAO = GL.GenVertexArray();
@@ -59,8 +58,9 @@ namespace GrassRendering.Objects
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
         }
+        #endregion
 
-        public void Draw(Camera camera, DayTimeScheduler scheduler, Vector4? plane = null)
+        public void Draw(Shader shader)
         {
             int texWindLocation = GL.GetUniformLocation(shader.Handle, "texWind");
             int[] texGrassLocations = new int[grassTexts.Count];
@@ -79,22 +79,17 @@ namespace GrassRendering.Objects
                 grassTexts[i].Use(TextureUnit.Texture0 + i + 1);
             }
 
-            shader.SetFloat("time", (float)scheduler.timer.Elapsed.TotalSeconds);
-            shader.SetVector3("cameraPos", camera.position);
-            shader.SetVector4("skyColor", scheduler.current);
-            shader.SetFloat("fogDensity", scheduler.fogDensity);
-            if (plane != null) shader.SetVector4("plane", (Vector4)plane);
-
-            shader.SetMatrix4("view", camera.GetViewMatrix());
-            shader.SetMatrix4("projection", camera.GetProjectionMatrix());
-
             GL.BindVertexArray(VAO);
             GL.DrawArrays(PrimitiveType.Points, 0, vertices.Length);
         }
 
         public void Unload()
         {
-            shader.Dispose();
+            GL.BindVertexArray(0);
+            GL.DeleteVertexArray(VAO); //unbind VAO buffer
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0); //unbind VBO buffer
+            GL.DeleteBuffer(VBO);
         }
     }
 }

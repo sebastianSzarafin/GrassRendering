@@ -1,7 +1,7 @@
 ﻿using OpenTK.Graphics.OpenGL4;
 using StbImageSharp;
 
-namespace GrassRendering
+namespace GrassRendering.Rendering
 {
     public class Texture
     {
