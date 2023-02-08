@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,17 +15,24 @@ namespace GrassRendering.Rendering
 {
     internal class MainRenderer
     {
+        private WaterFrameBuffers buffers;
+
+        private int[] extShaders;
+
         private List<IModel> models;
 
-        private WaterFrameBuffers buffers;
 
         public MainRenderer()
         {
             buffers = new WaterFrameBuffers();
 
+            extShaders = new int[]
+            {
+                Shader.GetShader("..\\..\\..\\shaders\\fog\\fog.glsl", ShaderType.FragmentShader),
+            };
             models = new List<IModel>()
             {
-                new Terrain(buffers),
+                new Terrain(extShaders, buffers),
             };
         }
 
@@ -86,6 +94,8 @@ namespace GrassRendering.Rendering
 
         public void Unload()
         {
+            foreach (int shader in extShaders) GL.DeleteShader(shader);
+
             foreach (IModel model in models) model.Unload();
 
             buffers.Unload();

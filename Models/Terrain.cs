@@ -12,26 +12,26 @@ namespace GrassRendering.Models
 
         List<IMesh> meshes;
 
-        public Terrain(WaterFrameBuffers buffers)
+        public Terrain(int[] extShaders, WaterFrameBuffers buffers)
         {
             shaders = new List<Shader>()
             {
                 //Ground shader
                 new Shader(
-                    Shader.GetShader("..\\..\\..\\shaders\\terrain\\terrainVS.glsl", ShaderType.VertexShader),
-                    Shader.GetShader("..\\..\\..\\shaders\\fog\\fog.glsl", ShaderType.FragmentShader),
-                    Shader.GetShader("..\\..\\..\\shaders\\terrain\\terrainFS.glsl", ShaderType.FragmentShader)),
+                    extShaders,
+                    Shader.GetShader("..\\..\\..\\shaders\\ground\\groundVS.glsl", ShaderType.VertexShader),
+                    Shader.GetShader("..\\..\\..\\shaders\\ground\\groundFS.glsl", ShaderType.FragmentShader)),
                 //Grass shader
                 new Shader(
+                    extShaders,
                     Shader.GetShader("..\\..\\..\\shaders\\grass\\grassVS.glsl", ShaderType.VertexShader),
                     Shader.GetShader("..\\..\\..\\shaders\\grass\\grassGS.glsl", ShaderType.GeometryShader),
-                    Shader.GetShader("..\\..\\..\\shaders\\fog\\fog.glsl", ShaderType.FragmentShader),
                     Shader.GetShader("..\\..\\..\\shaders\\grass\\grassFS.glsl", ShaderType.FragmentShader)),
                 //Water shader
                 new Shader(
+                    extShaders,
                     Shader.GetShader("..\\..\\..\\shaders\\water\\waterVS.glsl", ShaderType.VertexShader),
-                    Shader.GetShader("..\\..\\..\\shaders\\fog\\fog.glsl", ShaderType.FragmentShader),
-                    Shader.GetShader("..\\..\\..\\shaders\\water\\waterFS.glsl", ShaderType.FragmentShader))
+                    Shader.GetShader("..\\..\\..\\shaders\\water\\waterFS.glsl", ShaderType.FragmentShader)),
             };
 
             List<Vertex> vertices = ProcessVertices();

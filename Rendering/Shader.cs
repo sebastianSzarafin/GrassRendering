@@ -11,21 +11,25 @@ namespace GrassRendering.Rendering
 {
     public class Shader : IDisposable
     {
-        public int Handle { get; private set; } //location of the final shader program
+        private int handle; //location of the final shader program
         private bool disposedValue = false;
 
-        #region Constructors
-        public Shader(params int[] shaders)
-        {
-            Handle = GL.CreateProgram();
+        public int Handle { get => handle; }
 
-            foreach (int shader in shaders) GL.AttachShader(Handle, shader);
-            GL.LinkProgram(Handle);
+        #region Constructors
+        public Shader(int[] extShaders, params int[] shaders)
+        {
+            int[] allShaders = shaders.Concat(extShaders).ToArray();
+
+            handle = GL.CreateProgram();
+
+            foreach (int shader in allShaders) GL.AttachShader(handle, shader);
+            GL.LinkProgram(handle);
             {
-                GL.GetProgram(Handle, GetProgramParameterName.LinkStatus, out int success);
+                GL.GetProgram(handle, GetProgramParameterName.LinkStatus, out int success);
                 if (success == 0)
                 {
-                    string infoLog = GL.GetProgramInfoLog(Handle);
+                    string infoLog = GL.GetProgramInfoLog(handle);
                     Console.WriteLine(infoLog);
                 }
             }
@@ -33,7 +37,7 @@ namespace GrassRendering.Rendering
             //cleanup
             foreach (int shader in shaders)
             {
-                GL.DetachShader(Handle, shader);
+                GL.DetachShader(handle, shader);
                 GL.DeleteShader(shader);
             };
         }
@@ -64,42 +68,42 @@ namespace GrassRendering.Rendering
 
         public void Use()
         {
-            GL.UseProgram(Handle);
+            GL.UseProgram(handle);
         }
 
         public void SetFloat(string name, float value)
         {
-            int location = GL.GetUniformLocation(Handle, name);
+            int location = GL.GetUniformLocation(handle, name);
 
             GL.Uniform1(location, value);
         }
 
         public void SetVector3(string name, Vector3 vector)
         {
-            int location = GL.GetUniformLocation(Handle, name);
+            int location = GL.GetUniformLocation(handle, name);
 
             GL.Uniform3(location, vector);
         }
 
         public void SetVector4(string name, Vector4 vector)
         {
-            int location = GL.GetUniformLocation(Handle, name);
+            int location = GL.GetUniformLocation(handle, name);
 
             GL.Uniform4(location, vector);
         }
 
         public void SetMatrix4(string name, Matrix4 matrix)
         {
-            int location = GL.GetUniformLocation(Handle, name);
+            int location = GL.GetUniformLocation(handle, name);
 
             GL.UniformMatrix4(location, true, ref matrix);
         }
 
-        protected virtual void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (!disposedValue)
             {
-                GL.DeleteProgram(Handle);
+                GL.DeleteProgram(handle);
 
                 disposedValue = true;
             }
@@ -107,7 +111,7 @@ namespace GrassRendering.Rendering
 
         ~Shader()
         {
-            GL.DeleteProgram(Handle);
+            GL.DeleteProgram(handle);
         }
 
         public void Dispose()
