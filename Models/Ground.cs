@@ -63,9 +63,15 @@ namespace GrassRendering.Models
         private int[] ProcessIndices()
         {
             List<int> indices = new List<int>();
-            int colCount = (int)(Constants.treshhold * 2 / Constants.space), step = colCount / 10, quads = colCount / step, x = 0;
+
+            float riverStartFract = (Constants.waterStart + Constants.treshhold) / (2 * Constants.treshhold);
+            float riverEndFract = (Constants.waterEnd + Constants.treshhold) / (2 * Constants.treshhold);
+
+            int colCount = (int)(Constants.treshhold * 2 / Constants.space);
+            int step = colCount / 10;
+            int quads = colCount / step, x;
             //left side of the river
-            for (x = 0; x < (int)(0.7 * quads); x++)
+            for (x = 0; x < (int)(riverStartFract * quads); x++)
             {
                 for (int z = 0; z < quads; z++)
                 {
@@ -91,7 +97,7 @@ namespace GrassRendering.Models
             }
             //river
             step = 2; quads = colCount / step;
-            for (x = (int)(0.7 * quads); x < (int)(0.9 * quads); x++)
+            for (x = (int)(riverStartFract * quads); x < (int)(riverEndFract * quads); x++)
             {
                 for (int z = 0; z < quads; z++)
                 {
@@ -116,7 +122,7 @@ namespace GrassRendering.Models
                 }
             }
             //right side of the river
-            step = colCount / 10; quads = colCount / step; x = (int)(0.9 * quads);
+            step = colCount / 10; quads = colCount / step; x = (int)(riverEndFract * quads);
             for (int z = 0; z < quads; z++)
             {
                 int topLeft = z * step + x * step * colCount;

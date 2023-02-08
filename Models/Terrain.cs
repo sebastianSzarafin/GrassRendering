@@ -57,7 +57,7 @@ namespace GrassRendering.Models
             List<Vertex> vertices = new List<Vertex>();
             for (float x = -Constants.treshhold; x < Constants.treshhold; x = (float)Math.Round(x + Constants.space, 2))
             {
-                float y = getHeight(x, 4f / 10f * Constants.treshhold, 8f / 10f * Constants.treshhold);
+                float y = getHeight(x, Constants.waterStart, Constants.waterEnd);
                 for (float z = -Constants.treshhold; z < Constants.treshhold; z = (float)Math.Round(z + Constants.space, 2))
                 {
                     vertices.Add(
@@ -75,7 +75,7 @@ namespace GrassRendering.Models
                 if (x < begin || x > end) return 0.0f;
 
                 float a = (float)(-Math.PI / 2), b = -a;
-                float height = (float)-Math.Cos((b - a) * (x - begin) / (end - begin) + a) * Constants.treshhold / 10.0f;
+                float height = (float)-Math.Cos((b - a) * (x - begin) / (end - begin) + a);
                 return Math.Min(height, 0);
             }
         }

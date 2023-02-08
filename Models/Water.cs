@@ -72,7 +72,13 @@ namespace GrassRendering.Models
         private int[] ProcessIndices()
         {
             List<int> indices = new List<int>();
-            int colCount = (int)(Constants.treshhold * 2 / Constants.space), step = 2, quadsInCol = colCount / step, quadsInRow = (int)(0.4 * quadsInCol / step);
+
+            float riverWidthFract = (Constants.waterEnd - Constants.waterStart) / Constants.treshhold;
+
+            int colCount = (int)(Constants.treshhold * 2 / Constants.space);
+            int step = 2;
+            int quadsInCol = colCount / step, quadsInRow = (int)(riverWidthFract * quadsInCol / step);
+
             for (int x = 0; x < quadsInRow - 1; x++)
             {
                 for (int z = 0; z < quadsInCol; z++)
