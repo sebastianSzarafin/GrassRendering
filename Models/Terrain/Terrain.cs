@@ -4,7 +4,7 @@ using GrassRendering.Rendering;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 
-namespace GrassRendering.Models
+namespace GrassRendering.Models.Terrain
 {
     internal class Terrain : IModel
     {
@@ -57,7 +57,7 @@ namespace GrassRendering.Models
             List<Vertex> vertices = new List<Vertex>();
             for (float x = -Constants.treshhold; x < Constants.treshhold; x = (float)Math.Round(x + Constants.space, 2))
             {
-                float y = getHeight(x, Constants.waterStart, Constants.waterEnd);
+                float y = getHeight(x, Constants.waterStartPos, Constants.waterEndPos);
                 for (float z = -Constants.treshhold; z < Constants.treshhold; z = (float)Math.Round(z + Constants.space, 2))
                 {
                     vertices.Add(

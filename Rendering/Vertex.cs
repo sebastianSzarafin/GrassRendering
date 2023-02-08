@@ -22,5 +22,13 @@ namespace GrassRendering.Rendering
             aTexCoords = texCoords;
             aTexIndex = texIndex;
         }
+
+        public Vertex(Assimp.Vector3D posistion, Assimp.Vector3D normal, Assimp.Vector3D texCoords, float texIndex = 0)
+        {
+            aPosition = new Vector3(posistion.X, posistion.Y, posistion.Z);
+            aNormal = new Vector3(normal.X, normal.Y, normal.Z);
+            aTexCoords = new Vector2(texCoords.X, texCoords.Y);
+            aTexIndex = texIndex;
+        }
     }
 }

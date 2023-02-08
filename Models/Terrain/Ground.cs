@@ -2,46 +2,34 @@
 using GrassRendering.Models.Interfaces;
 using GrassRendering.Rendering;
 using OpenTK.Graphics.OpenGL4;
-using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GrassRendering.Models
+namespace GrassRendering.Models.Terrain
 {
-    internal class Water : IMesh
+    internal class Ground : IMesh
     {
         private Vertex[] vertices;
-        private int[] indices;
-        private Texture windText;
-
-        private WaterFrameBuffers buffers;
+        public int[] indices;
+        private Texture texTerrain;
 
         private int VAO;
         private int VBO;
         private int EBO;
 
-        public Water(Vertex[] vertices, Texture windText, WaterFrameBuffers buffers)
+        public Ground(Vertex[] vertices)
         {
             this.vertices = vertices;
-            this.windText = windText;
-            this.buffers = buffers;
-
-            /*this.vertices = new Vertex[4];
-            this.vertices[0] = new Vertex(new Vector3(4, Constants.waterHeight, -10), default, new Vector2(0,0));
-            this.vertices[1] = new Vertex(new Vector3(4, Constants.waterHeight, 10), default, new Vector2(0, 1));
-            this.vertices[2] = new Vertex(new Vector3(8, Constants.waterHeight, -10), default, new Vector2(1, 0));
-            this.vertices[3] = new Vertex(new Vector3(8, Constants.waterHeight, 10), default, new Vector2(1, 1));*/
-
-            //for (int i = 0; i < vertices.Length; i++) vertices[i].aPosition.Y = Constants.waterHeight;
 
             indices = ProcessIndices();
 
-            Setup();            
+            texTerrain = new Texture("..\\..\\..\\assets\\textures\\terrain.png", TextureUnit.Texture0);
+
+            Setup();
         }
 
         #region Preprocessing
@@ -65,6 +53,9 @@ namespace GrassRendering.Models
             // aNormal
             GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, Marshal.SizeOf(typeof(Vertex)), Marshal.OffsetOf(typeof(Vertex), "aNormal"));
             GL.EnableVertexAttribArray(1);
+            // aTexCoords
+            GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, Marshal.SizeOf(typeof(Vertex)), Marshal.OffsetOf(typeof(Vertex), "aTexCoords"));
+            GL.EnableVertexAttribArray(2);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
         }
@@ -73,20 +64,21 @@ namespace GrassRendering.Models
         {
             List<int> indices = new List<int>();
 
-            float riverWidthFract = (Constants.waterEnd - Constants.waterStart) / Constants.treshhold;
+            float riverStartFract = (Constants.waterStartFract + 1f) / 2f;
+            float riverEndFract = (Constants.waterEndFract + 1f) / 2f;
 
             int colCount = (int)(Constants.treshhold * 2 / Constants.space);
-            int step = 2;
-            int quadsInCol = colCount / step, quadsInRow = (int)(riverWidthFract * quadsInCol / step);
-
-            for (int x = 0; x < quadsInRow - 1; x++)
+            int step = colCount / 10;
+            int quads = colCount / step, x;
+            //left side of the river
+            for (x = 0; x < (int)(riverStartFract * quads); x++)
             {
-                for (int z = 0; z < quadsInCol; z++)
+                for (int z = 0; z < quads; z++)
                 {
                     int topLeft = z * step + x * step * colCount;
                     int topRight = z * step + (x + 1) * step * colCount;
 
-                    if (z == quadsInCol - 1)
+                    if (z == quads - 1)
                     {
                         topLeft--;
                         topRight--;
@@ -103,29 +95,68 @@ namespace GrassRendering.Models
                     indices.Add(bottomRight);
                 }
             }
-
-            /*List<int> indices = new List<int>()
+            //river
+            step = 2; quads = colCount / step;
+            for (x = (int)(riverStartFract * quads); x < (int)(riverEndFract * quads); x++)
             {
-                0,1,2,2,1,3
-            };*/
+                for (int z = 0; z < quads; z++)
+                {
+                    int topLeft = z * step + x * step * colCount;
+                    int topRight = z * step + (x + 1) * step * colCount;
+
+                    if (z == quads - 1)
+                    {
+                        topLeft--;
+                        topRight--;
+                    }
+
+                    int bottomLeft = topLeft + step;
+                    int bottomRight = topRight + step;
+
+                    indices.Add(topLeft);
+                    indices.Add(bottomLeft);
+                    indices.Add(topRight);
+                    indices.Add(topRight);
+                    indices.Add(bottomLeft);
+                    indices.Add(bottomRight);
+                }
+            }
+            //right side of the river
+            step = colCount / 10; quads = colCount / step; x = (int)(riverEndFract * quads);
+            for (int z = 0; z < quads; z++)
+            {
+                int topLeft = z * step + x * step * colCount;
+                int topRight = vertices.Length - (colCount - z * step);
+
+                if (z == quads - 1)
+                {
+                    topLeft--;
+                    topRight--;
+                }
+
+                int bottomLeft = topLeft + step;
+                int bottomRight = topRight + step;
+
+                indices.Add(topLeft);
+                indices.Add(bottomLeft);
+                indices.Add(topRight);
+                indices.Add(topRight);
+                indices.Add(bottomLeft);
+                indices.Add(bottomRight);
+            }
+
             return indices.ToArray();
         }
         #endregion
 
         public void Draw(Shader shader)
         {
-            int texReflectLocation = GL.GetUniformLocation(shader.Handle, "texReflect");
-            int texRefractLocation = GL.GetUniformLocation(shader.Handle, "texRefract");
-            int texWindLocation = GL.GetUniformLocation(shader.Handle, "texWind");
+            int texTerrainLocation = GL.GetUniformLocation(shader.Handle, "texTerrain");
 
             shader.Use();
 
-            GL.Uniform1(texReflectLocation, 0);
-            buffers.ReflectionTexture.Use(TextureUnit.Texture0);
-            GL.Uniform1(texRefractLocation, 1);
-            buffers.RefractionTexture.Use(TextureUnit.Texture1);
-            GL.Uniform1(texWindLocation, 2);
-            windText.Use(TextureUnit.Texture2);
+            GL.Uniform1(texTerrainLocation, 0);
+            texTerrain.Use(TextureUnit.Texture0);
 
             GL.BindVertexArray(VAO);
             GL.DrawElements(BeginMode.Triangles, indices.Length, DrawElementsType.UnsignedInt, 0);

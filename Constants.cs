@@ -12,7 +12,11 @@ namespace GrassRendering
         public const float space = 0.2f;
 
         public const float waterHeight = -0.05f;
-        public const float waterStart = 0.4f * treshhold;
-        public const float waterEnd =  2f * waterStart;
+        public const float waterStartFract = 0.4f;
+        public const float waterEndFract =  0.8f;
+        public const float waterWidthFract = waterEndFract - waterStartFract;
+        public const float waterStartPos = waterStartFract * treshhold;
+        public const float waterEndPos = waterEndFract * treshhold;
+
     }
 }

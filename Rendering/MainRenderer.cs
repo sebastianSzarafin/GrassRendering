@@ -1,15 +1,9 @@
 ﻿using GrassRendering.Controllers;
-using GrassRendering.Models;
+using GrassRendering.Models.Terrain;
 using GrassRendering.Models.Interfaces;
 using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
+using GrassRendering.Models;
 
 namespace GrassRendering.Rendering
 {
@@ -33,7 +27,13 @@ namespace GrassRendering.Rendering
             models = new List<IModel>()
             {
                 new Terrain(extShaders, buffers),
-            };
+                new Duck(
+                    "..\\..\\..\\assets\\models\\duck\\duck.dae",
+                    new Shader(
+                        extShaders,
+                        Shader.GetShader("..\\..\\..\\shaders\\duck\\duckVS.glsl", ShaderType.VertexShader),
+                        Shader.GetShader("..\\..\\..\\shaders\\duck\\duckFS.glsl", ShaderType.FragmentShader))),
+        };
         }
 
         public void Draw(Camera camera, DayTimeScheduler scheduler)

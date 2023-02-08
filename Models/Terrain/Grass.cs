@@ -12,7 +12,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GrassRendering.Models
+namespace GrassRendering.Models.Terrain
 {
     internal class Grass : IMesh
     {
@@ -34,7 +34,7 @@ namespace GrassRendering.Models
             };
             for (int i = 1; i <= 4; i++)
                 grassTexts.Add(new Texture($"..\\..\\..\\assets\\textures\\flower{i}_texture.png", TextureUnit.Texture0 + i + 1));
-            
+
             Setup();
         }
 
