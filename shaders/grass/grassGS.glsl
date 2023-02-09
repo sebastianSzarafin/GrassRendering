@@ -123,7 +123,7 @@ void createGrass(vec4 basePosition, int numberOfQuads)
 
 void main()
 {
-	gl_ClipDistance[0] = dot( vec4(gs_in[0].position, 1.0), plane);
+	gl_ClipDistance[0] = dot(vec4(gs_in[0].position, 1.0), plane);
 	//if(gs_in[0].height < 0) return;
 
     grassSize = 

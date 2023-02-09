@@ -6,30 +6,26 @@ layout (location = 2) in vec2 aTexCoord;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
-
-//const int maxLights = 2;
-//uniform vec3 lightPosition[maxLights];
-
+uniform vec3 cameraPos;
+uniform vec4 plane;
 
 out VS_OUT {
     vec2 texCoord;
     vec3 surfaceNormal;
-    //vec3 toLightVector[maxLights];
     vec3 worldPos;
+    float distanceFromCamera;
 } vs_out;
 
 void main()
 {
+    gl_ClipDistance[0] = dot(vec4(aPosition, 1.0), plane);
+
     vec4 worldPos = vec4(aPosition, 1.0) * model; 
     vs_out.worldPos = worldPos.xyz;
 
     gl_Position = worldPos * view * projection;
 
     vs_out.texCoord = aTexCoord;
-
     vs_out.surfaceNormal = aNormal * mat3(transpose(inverse(model)));
-    //for(int i = 0; i < maxLights; i++)
-    //{
-    //    vs_out.toLightVector[i] = lightPosition[i] - worldPos.xyz;
-    //}
+    vs_out.distanceFromCamera = length(aPosition - cameraPos);
 }

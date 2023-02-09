@@ -103,18 +103,25 @@ namespace GrassRendering.Models.Terrain
         }
         #endregion
 
-        public void Draw(Camera camera, DayTimeScheduler scheduler, bool _, Vector4? plane = null)
+        public void Draw(Light light, Camera camera, DayTimeScheduler scheduler, bool _, Vector4? plane = null)
         {
             for (int i = 0; i < meshes.Count; i++)
             {
-                ConfigureShader(shaders[i], camera, scheduler, plane);
+                ConfigureShader(shaders[i], light, camera, scheduler, plane);
                 meshes[i].Draw(shaders[i]);
             }
         }
 
-        private void ConfigureShader(Shader shader, Camera camera, DayTimeScheduler scheduler, Vector4? plane = null)
+        private void ConfigureShader(Shader shader, Light light, Camera camera, DayTimeScheduler scheduler, Vector4? plane = null)
         {
             shader.Use();
+
+            for (int i = 0; i < light.Positions.Length; i++)
+            {
+                shader.SetVector3($"lightPosition[{i}]", light.Positions[i]);
+                shader.SetVector3($"lightColor[{i}]", light.Colors[i]);
+                shader.SetVector3($"attenuation[{i}]", light.Attenuations[i]);
+            }
 
             shader.SetFloat("time", (float)scheduler.timer.Elapsed.TotalSeconds);
             shader.SetVector3("cameraPos", camera.position);

@@ -4,22 +4,25 @@ layout (location = 0) in vec3 aPosition;
 layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aTexCoord;
 
-out vec2 texCoord;
-out float distanceFromCamera;
+/*CONSTANTS*/
+const float tiling = 10.0;
+
+out VS_OUT {
+	float distanceFromCamera; 
+	vec2 texCoord;
+} vs_out;
 
 uniform mat4 view;
 uniform mat4 projection;
 uniform vec3 cameraPos;
-uniform  vec4 plane;
+uniform vec4 plane;
 
-/*CONSTANTS*/
-const float tiling = 10.0;
 
 void main() {
-	gl_ClipDistance[0] = dot( vec4(aPosition, 1.0), plane);
+	gl_ClipDistance[0] = dot(vec4(aPosition, 1.0), plane);
 
 	gl_Position = vec4(aPosition, 1.0) * view * projection;
 
-	distanceFromCamera = length(aPosition - cameraPos);
-    texCoord = aTexCoord * tiling;
+	vs_out.distanceFromCamera = length(aPosition - cameraPos);
+    vs_out.texCoord = aTexCoord * tiling;
 }

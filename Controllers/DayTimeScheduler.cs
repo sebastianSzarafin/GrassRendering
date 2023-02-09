@@ -45,8 +45,8 @@ namespace GrassRendering.Controllers
                 else if (time == DayTime.Morning && mix <= 0.5) return (0.5f - mix) / 5;
                 return 0.0f;*/
 
-                /*//Fog only
-                return 0.1f;*/
+                //Fog only
+                //return 0.1f;
 
                 //No fog
                 return 0.0f;

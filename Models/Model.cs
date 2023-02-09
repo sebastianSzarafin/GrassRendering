@@ -1,6 +1,7 @@
 ﻿using GrassRendering.Controllers;
 using GrassRendering.Models.Interfaces;
 using GrassRendering.Rendering;
+using OpenTK.Graphics.ES11;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
@@ -25,15 +26,45 @@ namespace GrassRendering.Models
             LoadModel(path);
         }
 
-        public virtual void Draw(Camera camera, DayTimeScheduler scheduler, bool _, Vector4? plane = null)
+        public virtual void Draw(Light light, Camera camera, DayTimeScheduler scheduler, bool _, Vector4? plane = null)
         {
-            ConfigureShader(camera, scheduler, plane);
+            ConfigureShader(light, camera, scheduler, plane);
             foreach (Mesh mesh in meshes) mesh.Draw(shader);
         }
 
-        private void ConfigureShader(Camera camera, DayTimeScheduler scheduler, Vector4? plane = null)
+        private void ConfigureShader(Light light, Camera camera, DayTimeScheduler scheduler, Vector4? plane = null)
         {
             shader.Use();
+
+            for (int i = 0; i < light.Positions.Length; i++)
+            {
+                shader.SetVector3($"lightPosition[{i}]", light.Positions[i]);
+                shader.SetVector3($"lightColor[{i}]", light.Colors[i]);
+                shader.SetVector3($"attenuation[{i}]", light.Attenuations[i]);
+            }
+
+            shader.SetFloat("time", (float)scheduler.timer.Elapsed.TotalSeconds);
+            shader.SetVector3("cameraPos", camera.position);
+            shader.SetVector4("skyColor", scheduler.current);
+            shader.SetFloat("fogDensity", scheduler.fogDensity);
+            if (plane != null) shader.SetVector4("plane", (Vector4)plane);
+
+            shader.SetMatrix4("model", model);
+            shader.SetMatrix4("view", camera.GetViewMatrix());
+            shader.SetMatrix4("projection", camera.GetProjectionMatrix());
+        }
+
+        public virtual void Draw(Vector3 lightColor, Camera camera, DayTimeScheduler scheduler, bool _, Vector4? plane = null)
+        {
+            ConfigureLightShader(lightColor, camera, scheduler, plane);
+            foreach (Mesh mesh in meshes) mesh.Draw(shader);
+        }
+
+        private void ConfigureLightShader(Vector3 lightColor, Camera camera, DayTimeScheduler scheduler, Vector4? plane = null)
+        {
+            shader.Use();
+
+            shader.SetVector3("color", lightColor);
 
             shader.SetFloat("time", (float)scheduler.timer.Elapsed.TotalSeconds);
             shader.SetVector3("cameraPos", camera.position);

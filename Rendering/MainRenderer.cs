@@ -15,6 +15,8 @@ namespace GrassRendering.Rendering
 
         private List<IModel> models;
 
+        private Light light;
+
 
         public MainRenderer()
         {
@@ -22,7 +24,8 @@ namespace GrassRendering.Rendering
 
             extShaders = new int[]
             {
-                Shader.GetShader("..\\..\\..\\shaders\\fog\\fog.glsl", ShaderType.FragmentShader),
+                Shader.GetShader("..\\..\\..\\shaders\\external\\fog.glsl", ShaderType.FragmentShader),
+                Shader.GetShader("..\\..\\..\\shaders\\external\\lightning.glsl", ShaderType.FragmentShader),
             };
             models = new List<IModel>()
             {
@@ -33,7 +36,14 @@ namespace GrassRendering.Rendering
                         extShaders,
                         Shader.GetShader("..\\..\\..\\shaders\\duck\\duckVS.glsl", ShaderType.VertexShader),
                         Shader.GetShader("..\\..\\..\\shaders\\duck\\duckFS.glsl", ShaderType.FragmentShader))),
-        };
+            };
+
+            light = new Light(
+                "..\\..\\..\\assets\\models\\light\\sphere.obj",
+                new Shader(
+                        extShaders,
+                        Shader.GetShader("..\\..\\..\\shaders\\light\\lightVS.glsl", ShaderType.VertexShader),
+                        Shader.GetShader("..\\..\\..\\shaders\\light\\lightFS.glsl", ShaderType.FragmentShader)));
         }
 
         public void Draw(Camera camera, DayTimeScheduler scheduler, bool setVibrations)
@@ -58,10 +68,12 @@ namespace GrassRendering.Rendering
             camera.InvertPitch();
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            Vector4 plane = new Vector4(0, 1, 0, -(Constants.waterHeight + 0.001f));
             foreach (IModel model in models)
             {
-                model.Draw(camera, scheduler, setVibrations, new Vector4(0, 1, 0, -(Constants.waterHeight + 0.001f)));
+                model.Draw(light, camera, scheduler, setVibrations, plane);
             }
+            light.Draw(camera, scheduler, setVibrations, plane);
             GL.Finish();
 
             camera.position.Y += distance;
@@ -73,10 +85,12 @@ namespace GrassRendering.Rendering
             buffers.BindRefractionFrameBuffer();
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+            Vector4 plane = new Vector4(0, -1, 0, Constants.waterHeight);
             foreach (IModel model in models)
             {
-                model.Draw(camera, scheduler, setVibrations, new Vector4(0, -1, 0, Constants.waterHeight));
+                model.Draw(light, camera, scheduler, setVibrations, plane);
             }
+            light.Draw(camera, scheduler, setVibrations, plane);
             GL.Finish();
         }
 
@@ -88,8 +102,9 @@ namespace GrassRendering.Rendering
             GL.ClearColor((Color4)scheduler.current);
             foreach (IModel model in models)
             {
-                model.Draw(camera, scheduler, setVibrations);
+                model.Draw(light, camera, scheduler, setVibrations);
             }
+            light.Draw(camera, scheduler, setVibrations);
         }
 
         public void Unload()
@@ -97,6 +112,8 @@ namespace GrassRendering.Rendering
             foreach (int shader in extShaders) GL.DeleteShader(shader);
 
             foreach (IModel model in models) model.Unload();
+
+            light.Unload();
 
             buffers.Unload();
         }

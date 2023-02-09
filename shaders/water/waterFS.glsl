@@ -10,7 +10,6 @@ in VS_OUT {
 
 out vec4 outColor;
 
-uniform float fogDensity;
 uniform vec4 skyColor;
 uniform sampler2D texReflect;
 uniform sampler2D texRefract;
@@ -21,7 +20,7 @@ uniform float time;
 const float waveStrength = 0.001;
 
 /*FUNCTIONS*/
-float getVisibility(float, float);
+vec4 getFogColor(float, vec4);
 
 void main()
 {
@@ -54,5 +53,5 @@ void main()
     outColor = mix(reflectionColor, refractionColor, reflectiveFactor);
     outColor = mix(outColor, vec4(0.0, 0.3, 0.5, 1.0), 0.2);
 
-    outColor = mix(skyColor, outColor, getVisibility(fs_in.distanceFromCamera, fogDensity));
+	outColor = getFogColor(fs_in.distanceFromCamera, outColor);
 }

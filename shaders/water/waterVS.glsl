@@ -13,10 +13,10 @@ out VS_OUT {
 uniform mat4 view;
 uniform mat4 projection;
 uniform vec3 cameraPos;
-uniform  vec4 plane;
+uniform vec4 plane;
 
 void main() {
-    gl_ClipDistance[0] = dot( vec4(aPosition, 1.0), plane);
+    gl_ClipDistance[0] = dot(vec4(aPosition, 1.0), plane);
 
     vs_out.normal = aNormal;
     vs_out.toCameraVector = cameraPos - aPosition;

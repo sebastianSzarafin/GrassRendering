@@ -10,7 +10,7 @@ namespace GrassRendering.Models.Interfaces
 {
     interface IModel
     {
-        void Draw(Camera camera, DayTimeScheduler scheduler, bool setVibrations, Vector4? plane = null);
+        void Draw(Light light, Camera camera, DayTimeScheduler scheduler, bool setVibrations, Vector4? plane = null);
         void Unload();
     }
 }

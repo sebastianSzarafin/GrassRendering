@@ -31,7 +31,7 @@ namespace GrassRendering.Models
             timer.Start();
         }
 
-        public override void Draw(Camera camera, DayTimeScheduler scheduler, bool setVibrations,  Vector4? plane = null)
+        public override void Draw(Light light, Camera camera, DayTimeScheduler scheduler, bool setVibrations,  Vector4? plane = null)
         {
             for (int i = 0; i < positions.Length; i++)
             {
@@ -42,7 +42,7 @@ namespace GrassRendering.Models
 
                 model = Move(positions[i], setVibrations, vibrationAngle);
 
-                base.Draw(camera, scheduler, setVibrations, plane);
+                base.Draw(light, camera, scheduler, setVibrations, plane);
 
                 if (!ShouldDrawMore(i + 1)) break;
             }
