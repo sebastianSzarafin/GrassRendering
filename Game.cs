@@ -18,6 +18,8 @@ namespace GrassRendering
 
         private MainRenderer renderer;
 
+        private bool setVibrations = false;
+
         public Game(int width, int height, string title)
             : base(
                   GameWindowSettings.Default,
@@ -78,7 +80,7 @@ namespace GrassRendering
 
             base.OnUpdateFrame(e);
 
-            if(Keyboard.ProcessInput(KeyboardState, camera, (float)e.Time))
+            if(Keyboard.ProcessInput(KeyboardState, camera, (float)e.Time, ref setVibrations))
             {
                 Close();
             }
@@ -90,7 +92,7 @@ namespace GrassRendering
 
         protected override void OnRenderFrame(FrameEventArgs args)
         {
-            renderer.Draw(camera, scheduler);
+            renderer.Draw(camera, scheduler, setVibrations);
 
             Context.SwapBuffers();
             base.OnRenderFrame(args);

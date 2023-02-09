@@ -36,20 +36,20 @@ namespace GrassRendering.Rendering
         };
         }
 
-        public void Draw(Camera camera, DayTimeScheduler scheduler)
+        public void Draw(Camera camera, DayTimeScheduler scheduler, bool setVibrations)
         {
             GL.Enable(EnableCap.ClipDistance0);
 
-            RenderReflectionTexture(camera, scheduler);
+            RenderReflectionTexture(camera, scheduler, setVibrations);
 
-            RenderRefractionTexture(camera, scheduler);
+            RenderRefractionTexture(camera, scheduler, setVibrations);
 
             GL.Disable(EnableCap.ClipDistance0);
 
-            RenderToScreen(camera, scheduler);
+            RenderToScreen(camera, scheduler, setVibrations);
         }
 
-        private void RenderReflectionTexture(Camera camera, DayTimeScheduler scheduler)
+        private void RenderReflectionTexture(Camera camera, DayTimeScheduler scheduler, bool setVibrations)
         {
             buffers.BindReflectionFrameBuffer();
 
@@ -60,7 +60,7 @@ namespace GrassRendering.Rendering
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             foreach (IModel model in models)
             {
-                model.Draw(camera, scheduler, new Vector4(0, 1, 0, -(Constants.waterHeight + 0.001f)));
+                model.Draw(camera, scheduler, setVibrations, new Vector4(0, 1, 0, -(Constants.waterHeight + 0.001f)));
             }
             GL.Finish();
 
@@ -68,19 +68,19 @@ namespace GrassRendering.Rendering
             camera.InvertPitch();
         }
 
-        private void RenderRefractionTexture(Camera camera, DayTimeScheduler scheduler)
+        private void RenderRefractionTexture(Camera camera, DayTimeScheduler scheduler, bool setVibrations)
         {
             buffers.BindRefractionFrameBuffer();
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             foreach (IModel model in models)
             {
-                model.Draw(camera, scheduler, new Vector4(0, -1, 0, Constants.waterHeight));
+                model.Draw(camera, scheduler, setVibrations, new Vector4(0, -1, 0, Constants.waterHeight));
             }
             GL.Finish();
         }
 
-        private void RenderToScreen(Camera camera, DayTimeScheduler scheduler)
+        private void RenderToScreen(Camera camera, DayTimeScheduler scheduler, bool setVibrations)
         {
             buffers.UnbindCurrentFrameBuffer();
 
@@ -88,7 +88,7 @@ namespace GrassRendering.Rendering
             GL.ClearColor((Color4)scheduler.current);
             foreach (IModel model in models)
             {
-                model.Draw(camera, scheduler);
+                model.Draw(camera, scheduler, setVibrations);
             }
         }
 

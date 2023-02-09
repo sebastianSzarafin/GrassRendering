@@ -1,4 +1,5 @@
-﻿using OpenTK.Windowing.GraphicsLibraryFramework;
+﻿using OpenTK.Mathematics;
+using OpenTK.Windowing.GraphicsLibraryFramework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,18 +10,15 @@ namespace GrassRendering.Controllers
 {
     internal static class Keyboard
     {
-        public static bool ProcessInput(KeyboardState input, Camera camera, float time)
+        public static bool ProcessInput(KeyboardState input, Camera camera, float time, ref bool setVibrations)
         {
             bool shouldClose = false;
-            //args.Time = deltaTime
-            //Explanation:
-            //Graphics applications and games usually keep track of a deltatime variable that stores the time
-            //it takes to render the last frame. We then multiply all velocities with this deltaTime value.
-            //The result is that when we have a large deltaTime in a frame, meaning that the last frame took
-            //longer than average, the velocity for that frame will also be a bit higher to balance it all out.
-            //When using this approach it does not matter if you have a very fast or slow pc, the velocity of
-            //the camera will be balanced out accordingly so each user will have the same experience.
-            //keyboard
+            
+            if (input.IsKeyDown(Keys.Escape))
+            {
+                shouldClose = true;
+            }
+
             if (input.IsKeyDown(Keys.W))
             {
                 camera.position += camera.front * Camera.cameraSpeed * time; // Forward
@@ -44,11 +42,17 @@ namespace GrassRendering.Controllers
             if (input.IsKeyDown(Keys.LeftShift))
             {
                 camera.position -= camera.up * Camera.cameraSpeed * time; // Down
-            }
-            if (input.IsKeyDown(Keys.Escape))
+            }            
+            
+            if (input.IsKeyPressed(Keys.V))
             {
-                shouldClose = true;
+                setVibrations = !setVibrations;
             }
+            
+            /*if (input.IsKeyPressed(Keys.C) *//*&& input.IsKeyPressed(Keys.KeyPad1)*//*)
+            {
+                camera.position = new Vector3(Constants.treshhold, 2, Constants.treshhold);
+            }*/
 
             if (camera.position.Y <= 1) camera.position.Y = 1;
 

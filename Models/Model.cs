@@ -25,7 +25,7 @@ namespace GrassRendering.Models
             LoadModel(path);
         }
 
-        public virtual void Draw(Camera camera, DayTimeScheduler scheduler, Vector4? plane = null)
+        public virtual void Draw(Camera camera, DayTimeScheduler scheduler, bool _, Vector4? plane = null)
         {
             ConfigureShader(camera, scheduler, plane);
             foreach (Mesh mesh in meshes) mesh.Draw(shader);

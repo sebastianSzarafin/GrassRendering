@@ -103,7 +103,7 @@ namespace GrassRendering.Models.Terrain
         }
         #endregion
 
-        public void Draw(Camera camera, DayTimeScheduler scheduler, Vector4? plane = null)
+        public void Draw(Camera camera, DayTimeScheduler scheduler, bool _, Vector4? plane = null)
         {
             for (int i = 0; i < meshes.Count; i++)
             {

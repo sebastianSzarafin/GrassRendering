@@ -16,6 +16,8 @@ namespace GrassRendering.Models
         private const float speed = 0.0025f;
         private const float offsetY = 0.1f;
 
+        private float vibrationAngle = MathHelper.DegreesToRadians(2.5f);
+
         private Vector3[] positions;
 
         private Stopwatch timer;
@@ -29,7 +31,7 @@ namespace GrassRendering.Models
             timer.Start();
         }
 
-        public override void Draw(Camera camera, DayTimeScheduler scheduler, Vector4? plane = null)
+        public override void Draw(Camera camera, DayTimeScheduler scheduler, bool setVibrations,  Vector4? plane = null)
         {
             for (int i = 0; i < positions.Length; i++)
             {
@@ -38,12 +40,14 @@ namespace GrassRendering.Models
 
                 positions[i].Y = offsetY + (float)Math.Cos(positions[i].Z * 5) / 20;
 
-                model = Move(positions[i]);
+                model = Move(positions[i], setVibrations, vibrationAngle);
 
-                base.Draw(camera, scheduler, plane);
+                base.Draw(camera, scheduler, setVibrations, plane);
 
                 if (!ShouldDrawMore(i + 1)) break;
-            }            
+            }
+
+            vibrationAngle *= -1;
         }
 
 
@@ -52,9 +56,13 @@ namespace GrassRendering.Models
             return new Vector3(WithdrawStartPos(), offsetY, -Constants.treshhold);
         }
 
-        private Matrix4 Move(Vector3 position)
+        private Matrix4 Move(Vector3 position, bool setVibrations, float angle)
         {
-            return Matrix4.CreateScale(0.5f) *
+            if (!setVibrations) angle = 0;
+
+            return 
+                Matrix4.CreateScale(0.5f) *
+                Matrix4.CreateRotationX(angle) *
                 Matrix4.CreateRotationY(MathHelper.DegreesToRadians(-90f)) *
                 Matrix4.CreateTranslation(position);
         }
