@@ -1,4 +1,5 @@
-﻿using OpenTK.Mathematics;
+﻿using GrassRendering.Rendering;
+using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
 using System;
 using System.Collections.Generic;
@@ -10,14 +11,31 @@ namespace GrassRendering.Controllers
 {
     internal static class Keyboard
     {
-        public static bool ProcessInput(KeyboardState input, Camera camera, float time, ref bool setVibrations)
+        public static bool ProcessInput(KeyboardState input, Camera camera, MainRenderer renderer, float time, ref bool setVibrations)
         {
-            bool shouldClose = false;
-            
-            if (input.IsKeyDown(Keys.Escape))
+            if (input.IsKeyDown(Keys.Escape)) return true;
+
+            if (input.IsKeyPressed(Keys.V))
             {
-                shouldClose = true;
+                setVibrations = !setVibrations;
+            }       
+            
+            if (input.IsKeyDown(Keys.C) && input.IsKeyDown(Keys.Up))
+            {
+                camera.Type = CameraType.FixedScene;
             }
+            if (input.IsKeyDown(Keys.C) && input.IsKeyDown(Keys.Down))
+            {
+                camera.Type = CameraType.FPP;
+            }
+            if (input.IsKeyDown(Keys.C) && input.IsKeyDown(Keys.Right))
+            {
+                camera.Type = CameraType.FixedObject;
+                renderer.UpdateWatchedObject();
+                Thread.Sleep(100);
+            }
+
+            if (camera.Type != CameraType.FPP) return false;
 
             if (input.IsKeyDown(Keys.W))
             {
@@ -43,20 +61,10 @@ namespace GrassRendering.Controllers
             {
                 camera.position -= camera.up * Camera.cameraSpeed * time; // Down
             }            
-            
-            if (input.IsKeyPressed(Keys.V))
-            {
-                setVibrations = !setVibrations;
-            }
-            
-            /*if (input.IsKeyPressed(Keys.C) *//*&& input.IsKeyPressed(Keys.KeyPad1)*//*)
-            {
-                camera.position = new Vector3(Constants.treshhold, 2, Constants.treshhold);
-            }*/
 
             if (camera.position.Y <= 1) camera.position.Y = 1;
 
-            return shouldClose;
+            return false;
         }
     }
 }

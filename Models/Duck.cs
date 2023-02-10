@@ -22,10 +22,12 @@ namespace GrassRendering.Models
 
         private Stopwatch timer;
 
-        public Duck(string path, Shader shader) : base(path, shader)
+        public Duck(string path, out Vector3[] positions, Shader shader) : base(path, shader)
         {
             positions = new Vector3[ducksCount];
             for(int i = 0; i < positions.Length; i++) positions[i] = ResetPosition();
+
+            this.positions = positions;
 
             timer = new Stopwatch();
             timer.Start();

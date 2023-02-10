@@ -8,6 +8,13 @@ using OpenTK.Windowing.GraphicsLibraryFramework;
 
 namespace GrassRendering.Controllers
 {
+    public enum CameraType
+    {
+        FPP,
+        FixedScene,
+        FixedObject
+    }
+
     internal class Camera
     {
         #region Properties
@@ -15,17 +22,20 @@ namespace GrassRendering.Controllers
         public const float cameraSpeed = 2.5f;
         public const float sensitivity = 0.2f;
 
+
         public Vector3 position;
         public Vector3 up;
         public Vector3 front;
-        public float aspectRatio;
-        private float fov;
         public Vector3 right;
+        private float aspectRatio;
+        private float fov;
 
         private float pitch;
         private float yaw;
 
         private Mouse mouse;
+
+        private CameraType type = CameraType.FPP;
         #endregion
 
         public Camera(Vector3 position, float aspectRatio)
@@ -101,6 +111,32 @@ namespace GrassRendering.Controllers
             // Recalculate rigth and up vectors
             right = Vector3.Normalize(Vector3.Cross(front, Vector3.UnitY));
             up = Vector3.Normalize(Vector3.Cross(right, front));
+        }
+
+        public CameraType Type
+        {
+            get => type;
+            set
+            {
+                switch (value)
+                {
+                    case CameraType.FPP:
+                        position = new Vector3(0.0f, 1.0f, 3.0f);
+                        Pitch = 0f;
+                        Yaw = -90f;
+                        break;
+                    case CameraType.FixedScene:
+                        Pitch = 0f;
+                        Yaw = -135f;
+                        position = new Vector3(Constants.treshhold, 2.0f, Constants.treshhold);
+                        break;
+                    case CameraType.FixedObject:
+                        Pitch = 0f;
+                        Yaw = 90f;
+                        break;
+                }
+                type = value;
+            }
         }
         #endregion
 

@@ -80,7 +80,7 @@ namespace GrassRendering
 
             base.OnUpdateFrame(e);
 
-            if(Keyboard.ProcessInput(KeyboardState, camera, (float)e.Time, ref setVibrations))
+            if(Keyboard.ProcessInput(KeyboardState, camera, renderer, (float)e.Time, ref setVibrations))
             {
                 Close();
             }

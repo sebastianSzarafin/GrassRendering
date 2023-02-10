@@ -14,6 +14,9 @@ namespace GrassRendering.Rendering
 
         private int[] extShaders;
 
+        private int watchedObjectIndex = -1;
+        private Vector3[] watchedObjectPositions;
+
         private Terrain terrain;
         private List<IModel> models;
 
@@ -36,6 +39,7 @@ namespace GrassRendering.Rendering
             {
                 new Duck(
                     "..\\..\\..\\assets\\models\\duck\\duck.dae",
+                    out watchedObjectPositions,
                     new Shader(
                         extShaders,
                         Shader.GetShader("..\\..\\..\\shaders\\duck\\duckVS.glsl", ShaderType.VertexShader),
@@ -50,8 +54,18 @@ namespace GrassRendering.Rendering
                         Shader.GetShader("..\\..\\..\\shaders\\light\\lightFS.glsl", ShaderType.FragmentShader)));
         }
 
+        public void UpdateWatchedObject()
+        {
+            watchedObjectIndex = (watchedObjectIndex + 1) % watchedObjectPositions.Length;
+        }
+
         public void Draw(Camera camera, DayTimeScheduler scheduler, bool setVibrations)
         {
+            if (camera.Type == CameraType.FixedObject)
+            {
+                camera.position = watchedObjectPositions[watchedObjectIndex] + new Vector3(0f, 0.5f, -0.5f);
+            }
+
             GL.Enable(EnableCap.ClipDistance0);
 
             RenderReflectionTexture(camera, scheduler, setVibrations);
