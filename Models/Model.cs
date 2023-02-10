@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static OpenTK.Graphics.OpenGL.GL;
 
 namespace GrassRendering.Models
 {
@@ -36,13 +37,18 @@ namespace GrassRendering.Models
         {
             shader.Use();
 
+            shader.SetFloat("sun.ambient", scheduler.Sun.ambient);
+            shader.SetVector3("sun.color", scheduler.Sun.color);
+            shader.SetVector3("sun.direction", scheduler.Sun.direction);
+
             for (int i = 0; i < light.Positions.Length; i++)
             {
                 shader.SetVector3($"lightPosition[{i}]", light.Positions[i]);
-                shader.SetVector3($"lightColor[{i}]", light.Colors[i]);
+                shader.SetVector3($"lightColor[{i}]", light.GetColors(scheduler.time)[i]);
                 shader.SetVector3($"attenuation[{i}]", light.Attenuations[i]);
             }
-
+            
+            shader.SetFloat("dayTime", (float)scheduler.time);
             shader.SetFloat("time", (float)scheduler.timer.Elapsed.TotalSeconds);
             shader.SetVector3("cameraPos", camera.position);
             shader.SetVector4("skyColor", scheduler.current);
@@ -63,6 +69,10 @@ namespace GrassRendering.Models
         private void ConfigureLightShader(Vector3 lightColor, Camera camera, DayTimeScheduler scheduler, Vector4? plane = null)
         {
             shader.Use();
+
+            shader.SetFloat("sun.ambient", scheduler.Sun.ambient);
+            shader.SetVector3("sun.color", scheduler.Sun.color);
+            shader.SetVector3("sun.direction", scheduler.Sun.direction);
 
             shader.SetVector3("color", lightColor);
 

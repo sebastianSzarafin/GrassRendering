@@ -52,9 +52,12 @@ namespace GrassRendering.Models.Terrain
             // aPosition
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Marshal.SizeOf(typeof(Vertex)), 0);
             GL.EnableVertexAttribArray(0);
-            // aTexIndex
-            GL.VertexAttribPointer(1, 1, VertexAttribPointerType.Float, false, Marshal.SizeOf(typeof(Vertex)), Marshal.OffsetOf(typeof(Vertex), "aTexIndex"));
+            // aNormal
+            GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, Marshal.SizeOf(typeof(Vertex)), Marshal.OffsetOf(typeof(Vertex), "aNormal"));
             GL.EnableVertexAttribArray(1);
+            // aTexIndex
+            GL.VertexAttribPointer(2, 1, VertexAttribPointerType.Float, false, Marshal.SizeOf(typeof(Vertex)), Marshal.OffsetOf(typeof(Vertex), "aTexIndex"));
+            GL.EnableVertexAttribArray(2);
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
         }

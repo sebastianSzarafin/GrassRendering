@@ -124,13 +124,18 @@ namespace GrassRendering.Models.Terrain
         {
             shader.Use();
 
+            shader.SetFloat("sun.ambient", scheduler.Sun.ambient);
+            shader.SetVector3("sun.color", scheduler.Sun.color);
+            shader.SetVector3("sun.direction", scheduler.Sun.direction);
+
             for (int i = 0; i < light.Positions.Length; i++)
             {
                 shader.SetVector3($"lightPosition[{i}]", light.Positions[i]);
-                shader.SetVector3($"lightColor[{i}]", light.Colors[i]);
+                shader.SetVector3($"lightColor[{i}]", light.GetColors(scheduler.time)[i]);
                 shader.SetVector3($"attenuation[{i}]", light.Attenuations[i]);
             }
 
+            shader.SetFloat("dayTime", (float)scheduler.time);
             shader.SetFloat("time", (float)scheduler.timer.Elapsed.TotalSeconds);
             shader.SetVector3("cameraPos", camera.position);
             shader.SetVector4("skyColor", scheduler.current);

@@ -2,10 +2,21 @@
 
 /*CONSTANTS*/
 const int lightsCount = 5;
-const float ambientStrength = 0.1;
+const float ambientStrength = 0.2;
 const float specularStrength = 0.5;
 const float shininess = 32;
 
+struct Sun {
+    float ambient;
+    vec3 color;
+    vec3 direction;
+  
+    //vec3 diffuse;
+    //vec3 specular;
+};
+
+uniform Sun sun;
+uniform float dayTime; // 0 - Morning, 1 - Afternoon, 2 - Evening, 3 - Night
 uniform vec3 lightPosition[lightsCount];
 uniform vec3 lightColor[lightsCount];
 uniform vec3 attenuation[lightsCount];
@@ -14,6 +25,10 @@ uniform vec3 cameraPos;
 /*FUNCTIONS*/
 vec4 getLightColor(vec4 color, vec3 surfaceNormal, vec3 worldPos)
 {
+    vec3 sunColor = sun.ambient * sun.color;
+
+    if(dayTime == 0 || dayTime == 1) return color * vec4(sunColor, 1.0);
+
     vec3 toLightVector[lightsCount];
     for(int i = 0; i < lightsCount; i++)
     {
@@ -43,7 +58,7 @@ vec4 getLightColor(vec4 color, vec3 surfaceNormal, vec3 worldPos)
         specular += specularStrength * spec * lightColor[i] / attFactor;
     }
     //ambient 
-    diffuse = max(diffuse, 0.2);
+    diffuse = max(diffuse, ambientStrength);
 
-    return vec4(diffuse + specular, 1.0) * color;
+    return vec4(sunColor + diffuse + specular, 1.0) * color;
 }

@@ -6,12 +6,15 @@ layout (triangle_strip, max_vertices = 12) out;
 
 in VS_OUT {
 	vec3 position;
+	vec3 normal;
     float texIndex;  
 	//float height;
 } gs_in[];
 
 
 out GS_OUT {
+	vec3 normal;
+    vec3 worldPos;
     vec2 texCoord;
     float colorVariation;
 	float texIndex;  	
@@ -76,11 +79,11 @@ void createQuad(vec4 basePosition, mat4 crossmodel, mat4 modelWind)
 		// apply the wind only to the top corners
 		if(i == 2) modelWindApply = modelWind;
 
-        gl_Position = 
-            (basePosition + vertexPosition[i] * grassSize * crossmodel * modelRandY * modelWindApply) * 
-            view * 
-            projection;
+		vec4 worldPos = (basePosition + vertexPosition[i] * grassSize * crossmodel * modelRandY * modelWindApply);
+        gl_Position = worldPos * view * projection;
 
+		gs_out.normal = gs_in[0].normal;
+		gs_out.worldPos = worldPos.xyz;
         gs_out.texCoord = texCoords[i];
         gs_out.colorVariation = fbm(basePosition.xz);
 		gs_out.texIndex = gs_in[0].texIndex;

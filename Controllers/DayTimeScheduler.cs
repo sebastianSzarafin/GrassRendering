@@ -1,4 +1,5 @@
-﻿using OpenTK.Graphics.ES20;
+﻿using GrassRendering.Models;
+using OpenTK.Graphics.ES20;
 using OpenTK.Mathematics;
 using System;
 using System.Collections.Generic;
@@ -23,36 +24,40 @@ namespace GrassRendering.Controllers
 
         private Vector4[] colors;
 
-        public float mix;
+        private float mix;
         public DayTime time;
+        public Stopwatch timer;
+
+        private Sun sun;
+
         public Vector4 current
         {
             get
             {
-                /*Vector4 c1 = colors[(int)time];
+                Vector4 c1 = colors[(int)time];
                 Vector4 c2 = colors[(int)(time + 1) % dayTimes];
-                return c1 * (1 - mix) + c2 * mix;*/
+                return c1 * (1 - mix) + c2 * mix;
 
                 //Fog only
-                return colors[0];
+                //return colors[0];
             }
         }
         public float fogDensity
         {
             get
             {
-                /*if (time == DayTime.Night && mix >= 0.5) return (mix - 0.5f) / 5;
+                if (time == DayTime.Night && mix >= 0.5) return (mix - 0.5f) / 5;
                 else if (time == DayTime.Morning && mix <= 0.5) return (0.5f - mix) / 5;
-                return 0.0f;*/
+                return 0.0f;
 
                 //Fog only
                 //return 0.1f;
 
                 //No fog
-                return 0.0f;
+                //return 0.0f;
             }
         }
-        public Stopwatch timer;
+        public Sun Sun { get => sun; }
 
         public DayTimeScheduler(DayTime time)
         {
@@ -65,6 +70,8 @@ namespace GrassRendering.Controllers
             colors[3] = new Vector4(0.05f, 0.08f, 0.27f, 1.0f); //Night
 
             timer = new Stopwatch();
+
+            sun = new Sun();
         }
 
         public void UpdateTime()
@@ -89,6 +96,8 @@ namespace GrassRendering.Controllers
             }
 
             mix = (float)(dayPart % period / period);
+
+            sun.UpdateStrength(dayPart);
         }
     }
 }

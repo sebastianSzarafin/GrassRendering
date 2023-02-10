@@ -2,6 +2,7 @@
 
 in VS_OUT {
     vec3 normal;
+    vec3 worldPos;
     vec2 texCoord;
     vec4 clipSpace;
     vec3 toCameraVector;
@@ -21,6 +22,7 @@ const float waveStrength = 0.001;
 
 /*FUNCTIONS*/
 vec4 getFogColor(float, vec4);
+vec4 getLightColor(vec4, vec3, vec3);
 
 void main()
 {
@@ -52,6 +54,8 @@ void main()
 
     outColor = mix(reflectionColor, refractionColor, reflectiveFactor);
     outColor = mix(outColor, vec4(0.0, 0.3, 0.5, 1.0), 0.2);
+
+    outColor = getLightColor(outColor, fs_in.normal, fs_in.worldPos);
 
 	outColor = getFogColor(fs_in.distanceFromCamera, outColor);
 }

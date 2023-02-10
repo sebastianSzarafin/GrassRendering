@@ -8,8 +8,10 @@ layout (location = 2) in vec2 aTexCoord;
 const float tiling = 10.0;
 
 out VS_OUT {
-	float distanceFromCamera; 
+    vec3 normal;
+    vec3 worldPos;
 	vec2 texCoord;
+	float distanceFromCamera; 
 } vs_out;
 
 uniform mat4 view;
@@ -23,6 +25,8 @@ void main() {
 
 	gl_Position = vec4(aPosition, 1.0) * view * projection;
 
-	vs_out.distanceFromCamera = length(aPosition - cameraPos);
+	vs_out.normal = aNormal;
+    vs_out.worldPos = aPosition;
     vs_out.texCoord = aTexCoord * tiling;
+	vs_out.distanceFromCamera = length(aPosition - cameraPos);
 }

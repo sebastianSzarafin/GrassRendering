@@ -2,6 +2,8 @@
 
 
 in GS_OUT {
+	vec3 normal;
+    vec3 worldPos;
     vec2 texCoord;
 	float colorVariation;
 	float texIndex;
@@ -23,6 +25,7 @@ float texBorderDetail = 0.1;
 vec4 mapTexture();
 bool isTexBorder(vec3);
 vec4 getFogColor(float, vec4);
+vec4 getLightColor(vec4, vec3, vec3);
 
 void main(){
 	vec4 color = mapTexture();
@@ -30,6 +33,8 @@ void main(){
 
 	if(color.a < 0.05
 	|| isTexBorder(color.xyz)) discard;
+
+    color = getLightColor(color, fs_in.normal, fs_in.worldPos);
 
 	outColor = getFogColor(fs_in.distanceFromCamera, color);
 }

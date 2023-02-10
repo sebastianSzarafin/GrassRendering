@@ -4,6 +4,7 @@ layout (location = 1) in vec3 aNormal;
 
 out VS_OUT {
     vec3 normal;
+    vec3 worldPos;
     vec2 texCoord;
     vec4 clipSpace;
     vec3 toCameraVector;
@@ -19,6 +20,7 @@ void main() {
     gl_ClipDistance[0] = dot(vec4(aPosition, 1.0), plane);
 
     vs_out.normal = aNormal;
+    vs_out.worldPos = aPosition;
     vs_out.toCameraVector = cameraPos - aPosition;
     vs_out.distanceFromCamera = length(aPosition - cameraPos);
 
