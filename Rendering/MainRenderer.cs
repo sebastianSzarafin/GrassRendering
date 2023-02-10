@@ -9,10 +9,12 @@ namespace GrassRendering.Rendering
 {
     internal class MainRenderer
     {
+
         private WaterFrameBuffers buffers;
 
         private int[] extShaders;
 
+        private Terrain terrain;
         private List<IModel> models;
 
         private Light light;
@@ -20,6 +22,7 @@ namespace GrassRendering.Rendering
 
         public MainRenderer()
         {
+
             buffers = new WaterFrameBuffers();
 
             extShaders = new int[]
@@ -27,9 +30,10 @@ namespace GrassRendering.Rendering
                 Shader.GetShader("..\\..\\..\\shaders\\external\\fog.glsl", ShaderType.FragmentShader),
                 Shader.GetShader("..\\..\\..\\shaders\\external\\lightning.glsl", ShaderType.FragmentShader),
             };
+
+            terrain = new Terrain(extShaders, buffers);
             models = new List<IModel>()
             {
-                new Terrain(extShaders, buffers),
                 new Duck(
                     "..\\..\\..\\assets\\models\\duck\\duck.dae",
                     new Shader(
@@ -68,7 +72,8 @@ namespace GrassRendering.Rendering
             camera.InvertPitch();
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-            Vector4 plane = new Vector4(0, 1, 0, -(Constants.waterHeight + 0.001f));
+            Vector4 plane = new Vector4(0, 1, 0, -Constants.waterHeight);
+            terrain.Draw(light, camera, scheduler, plane);
             foreach (IModel model in models)
             {
                 model.Draw(light, camera, scheduler, setVibrations, plane);
@@ -86,6 +91,7 @@ namespace GrassRendering.Rendering
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             Vector4 plane = new Vector4(0, -1, 0, Constants.waterHeight);
+            terrain.Draw(light, camera, scheduler, plane);
             foreach (IModel model in models)
             {
                 model.Draw(light, camera, scheduler, setVibrations, plane);
@@ -100,6 +106,8 @@ namespace GrassRendering.Rendering
 
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
             GL.ClearColor((Color4)scheduler.current);
+            terrain.Draw(light, camera, scheduler);
+            terrain.DrawRiver(light, camera, scheduler);
             foreach (IModel model in models)
             {
                 model.Draw(light, camera, scheduler, setVibrations);

@@ -6,11 +6,13 @@ using OpenTK.Mathematics;
 
 namespace GrassRendering.Models.Terrain
 {
-    internal class Terrain : IModel
+    internal class Terrain
     {
-        List<Shader> shaders;
+        private List<Shader> shaders;
+        private Shader waterShader;
 
-        List<IMesh> meshes;
+        private List<IMesh> meshes;
+        private Water water;
 
         public Terrain(int[] extShaders, WaterFrameBuffers buffers)
         {
@@ -27,12 +29,12 @@ namespace GrassRendering.Models.Terrain
                     Shader.GetShader("..\\..\\..\\shaders\\grass\\grassVS.glsl", ShaderType.VertexShader),
                     Shader.GetShader("..\\..\\..\\shaders\\grass\\grassGS.glsl", ShaderType.GeometryShader),
                     Shader.GetShader("..\\..\\..\\shaders\\grass\\grassFS.glsl", ShaderType.FragmentShader)),
-                //Water shader
+            };
+            waterShader =
                 new Shader(
                     extShaders,
                     Shader.GetShader("..\\..\\..\\shaders\\water\\waterVS.glsl", ShaderType.VertexShader),
-                    Shader.GetShader("..\\..\\..\\shaders\\water\\waterFS.glsl", ShaderType.FragmentShader)),
-            };
+                    Shader.GetShader("..\\..\\..\\shaders\\water\\waterFS.glsl", ShaderType.FragmentShader));
 
             List<Vertex> vertices = ProcessVertices();
 
@@ -44,11 +46,11 @@ namespace GrassRendering.Models.Terrain
                 new Grass(
                     vertices.Where(v => v.aPosition.Y >= 0).ToArray(),
                     windText),
-                new Water(
-                    vertices.Where(v => v.aPosition.Y < 0).Select(v => {v.aPosition.Y = Constants.waterHeight; return v; }).ToArray(),
-                    windText,
-                    buffers),
             };
+            water = new Water(
+                    vertices.Where(v => v.aPosition.Y < 0).Select(v => { v.aPosition.Y = Constants.waterHeight; return v; }).ToArray(),
+                    windText,
+                    buffers);
         }
 
         #region Preprocessing
@@ -103,13 +105,19 @@ namespace GrassRendering.Models.Terrain
         }
         #endregion
 
-        public void Draw(Light light, Camera camera, DayTimeScheduler scheduler, bool _, Vector4? plane = null)
+        public void Draw(Light light, Camera camera, DayTimeScheduler scheduler, Vector4? plane = null)
         {
             for (int i = 0; i < meshes.Count; i++)
             {
                 ConfigureShader(shaders[i], light, camera, scheduler, plane);
                 meshes[i].Draw(shaders[i]);
             }
+        }
+
+        public void DrawRiver(Light light, Camera camera, DayTimeScheduler scheduler, Vector4? plane = null)
+        {
+            ConfigureShader(waterShader, light, camera, scheduler, plane);
+            water.Draw(waterShader);
         }
 
         private void ConfigureShader(Shader shader, Light light, Camera camera, DayTimeScheduler scheduler, Vector4? plane = null)

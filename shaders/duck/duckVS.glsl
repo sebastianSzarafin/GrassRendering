@@ -18,10 +18,10 @@ out VS_OUT {
 
 void main()
 {
-    gl_ClipDistance[0] = dot(vec4(aPosition, 1.0), plane);
-
     vec4 worldPos = vec4(aPosition, 1.0) * model; 
     vs_out.worldPos = worldPos.xyz;
+
+    gl_ClipDistance[0] = dot(worldPos, plane);
 
     gl_Position = worldPos * view * projection;
 
