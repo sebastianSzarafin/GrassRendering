@@ -27,5 +27,5 @@ void main()
 
     vs_out.texCoord = aTexCoord;
     vs_out.surfaceNormal = aNormal * mat3(transpose(inverse(model)));
-    vs_out.distanceFromCamera = length(aPosition - cameraPos);
+    vs_out.distanceFromCamera = length(worldPos.xyz - cameraPos);
 }
