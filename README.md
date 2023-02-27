@@ -19,3 +19,7 @@ Starting this project there were defined crutial functionalities that needed to 
 - Fog effect
 - Mirror effect (accomplished with the water flow simulation)
 ---
+
+## Description
+As mentioned before, the scene consists of 3D objects. In particular of grass clumps created with 2D billboards, where each clump has some random factors (such as height) to make the look more realistic. Combined with a flowmap it generated a pretty decent wind effect.
+dupa
