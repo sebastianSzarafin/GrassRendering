@@ -29,4 +29,7 @@ Apart from grass, a significant milestone was the river simulation. The mirror w
 To simulate some point lights, a basic Phong model was used. Simple spheres above the water, are only for visualisation. The lights turn themselfes on during nighttime.
 ### Fog
 Depending from the time of the day, objects may or may not be more or less visible. That is thanks to the fog effect, calculated with function 
-$e^{-(distance * density)^{gradient}}$ based on the object's distance from camera, and 2 factors - fog density dependent from the day time, and gradient which is responsible for how quickly visibility decreases with distance. The effect is strongest in the morning (right after the nighttime).
+\[
+    e^{-(distance * density)^{gradient}}$
+]\
+based on the object's distance from camera, and 2 factors - fog density dependent from the day time, and gradient which is responsible for how quickly visibility decreases with distance. The effect is strongest in the morning (right after the nighttime).
