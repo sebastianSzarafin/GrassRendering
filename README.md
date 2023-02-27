@@ -1,6 +1,6 @@
 # GrassRendering
 <p align="center">
-    <img width="700" alt="1startup" src="https://user-images.githubusercontent.com/74315304/221588943-ec04eddb-57fa-4641-972b-6fa647dd9907.png">
+    <img width="700" alt="scenery" src="https://user-images.githubusercontent.com/74315304/221588943-ec04eddb-57fa-4641-972b-6fa647dd9907.png">
 </p>
 
 ## Introduction
@@ -13,9 +13,9 @@ Starting this project there were defined crutial functionalities that needed to 
   - fixed, observing the scene
   - fixed, following the moving object (in this case rubber ducks) 
   - FPP
-- Illumination with multiple light sources
-- Fog
 - Day/night cycle
-- Light fading along with distance increase
+- Illumination with multiple light sources
+- Light fading along with increasing the distance 
+- Fog effect
 - Mirror effect (accomplished with the water flow simulation)
 ---
