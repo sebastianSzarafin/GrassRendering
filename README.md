@@ -4,6 +4,8 @@
 </p>
 
 ## Introduction
-This is a project for *Computer Graphics 2022* course on Computer Science course. The application displays a small scenery which consists of 3D objects, some of them imported using [Assimp](https://learnopengl.com/Model-Loading/Assimp) library, and some of them implemented directly in code.
+This is a project for *Computer Graphics 2022* course on Computer Science course. The application is implemented on GPU with usage of OpenGL library. It displays a small scenery which consists of 3D objects, some of them imported using [Assimp](https://learnopengl.com/Model-Loading/Assimp) package, and some of them written directly in code.
+
+Starting this project there were defined crutial functionalities that needed to be implemented into the code, they are:
   
 ---
