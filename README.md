@@ -4,6 +4,6 @@
 </p>
 
 ## Introduction
-This is a project for *Computer Graphics 2022* course on Computer Science course. The application consists of many 3D objects, which combined create a small scenery. 
+This is a project for *Computer Graphics 2022* course on Computer Science course. The application displays a small scenery which consists of 3D objects, some of them imported using [Assimp](https://learnopengl.com/Model-Loading/Assimp) library, and some of them implemented directly in code.
   
 ---
