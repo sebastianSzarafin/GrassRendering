@@ -32,4 +32,4 @@ Depending from the time of the day, objects may or may not be more or less visib
 $$e^{-(distance \cdot density)^{gradient}}$$
 based on the object's $distance$ from camera, and 2 factors - fog $density$ dependent from the day time, and $gradient$ which is responsible for how quickly visibility decreases with distance. The effect is strongest in the morning (right after the nighttime).
 ### Moving objects
-//TODO
+Final detail was adding a bunch of floating ducks on the water. Each one draws a starting position, moves on a flatten sinusoid in a straight line to the end of the scene and loops back to the beginning.
