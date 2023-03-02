@@ -22,6 +22,11 @@ Starting this project there were defined crutial functionalities that needed to 
 
 ## Description
 ### Grass
+<p align="center">
+    <img width="700" alt="grass" src="https://user-images.githubusercontent.com/74315304/222485696-275f82d9-9bd0-47d1-b80a-7c8927871079.gif">
+</p>
+
+
 As mentioned before, the scene consists of 3D objects. In particular of grass clumps created with 2D billboards, where each clump has some random factors (such as height) to make the look more realistic. Combined with a flowmap it generated a pretty decent wind effect. Also, for optimalization purpouses, the bigger the distance from camera is, the less clumps are drawn.
 ### Water
 Apart from grass, a significant milestone was the river simulation. The mirror was obtained by creating 2 additional textures based on the camera coordinates - reflection and refraction, showing respectively it's reflection and the terrain underneath. They need to be calculated during each frame render and mixed in a shader afterwards. When mixed by a factor based on an angle between camera position and a water tile's normal it was possible to attain Fresnel Effect. To make it more "wavy", the same flowmap was applied.
