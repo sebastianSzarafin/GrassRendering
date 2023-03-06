@@ -30,9 +30,9 @@ As mentioned before, the scene consists of 3D objects. In particular of grass cl
 ### Water
 Apart from grass, a significant milestone was the river simulation. The mirror was obtained by creating 2 additional textures based on the camera coordinates - reflection and refraction, showing respectively it's reflection and the terrain underneath. They need to be calculated during each frame render and mixed in a shader afterwards. 
 <p align="center">
-    <img width="33%" alt="reflection" src="https://user-images.githubusercontent.com/74315304/222494597-e50c4aca-d785-4dbc-adc3-d18535a319ec.png">
-    <img width="33%" alt="refraction" src="https://user-images.githubusercontent.com/74315304/222494607-562417f4-2ac2-4d8d-8f44-bbee03c42bbc.png">
-    <img width="33%" alt="mirror" src="https://user-images.githubusercontent.com/74315304/222497184-c8ffb002-cc3e-4fd7-b1dd-71b64d6321ca.png">
+    <img width="32%" alt="reflection" src="https://user-images.githubusercontent.com/74315304/222494597-e50c4aca-d785-4dbc-adc3-d18535a319ec.png">
+    <img width="32%" alt="refraction" src="https://user-images.githubusercontent.com/74315304/222494607-562417f4-2ac2-4d8d-8f44-bbee03c42bbc.png">
+    <img width="32%" alt="mirror" src="https://user-images.githubusercontent.com/74315304/222497184-c8ffb002-cc3e-4fd7-b1dd-71b64d6321ca.png">
 </p>
 When mixed by a factor based on an angle between camera position and a water tile's normal it was possible to attain Fresnel Effect. To make it more "wavy", the same flowmap was applied. <br><br>
 <p align="center">
